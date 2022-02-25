@@ -1,12 +1,13 @@
 package com.tasksbb.train.dto;
 
 
-
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
 import javax.validation.constraints.NotEmpty;
 
-@Data
+@Getter
+@Setter
 public class UserDTO {
 
     private Long id;
