@@ -3,8 +3,8 @@ package com.tasksbb.train.annotations;
 import com.tasksbb.train.validations.EmailValidator;
 import javax.validation.Constraint;
 import javax.validation.Payload;
+import java.lang.annotation.*;
 
-import java.lang.annotation.*;// todo
 
 
 @Target({ElementType.TYPE, ElementType.FIELD, ElementType.ANNOTATION_TYPE})

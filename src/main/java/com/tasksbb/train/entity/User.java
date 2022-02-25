@@ -2,9 +2,7 @@ package com.tasksbb.train.entity;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.tasksbb.train.entity.enums.ERole;
-import lombok.Builder;
-import lombok.Data;
-import lombok.Generated;
+import lombok.*;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
@@ -15,7 +13,9 @@ import java.util.HashSet;
 import java.util.Set;
 
 
-@Data
+//@Data
+@Getter
+@Setter
 @Entity
 public class User implements UserDetails {
     @Id
