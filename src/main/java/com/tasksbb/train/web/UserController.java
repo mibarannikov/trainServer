@@ -20,12 +20,18 @@ import java.security.Principal;
 @CrossOrigin
 public class UserController {
 
-    @Autowired  //todo
-    private UserService userService;
-    @Autowired
-    private UserFacade userFacade;
-    @Autowired
-    private ResponseErrorValidation responseErrorValidation;
+
+    private final UserService userService;
+
+    private final UserFacade userFacade;
+
+    private final ResponseErrorValidation responseErrorValidation;
+
+    public UserController(UserService userService, UserFacade userFacade, ResponseErrorValidation responseErrorValidation) {
+        this.userService = userService;
+        this.userFacade = userFacade;
+        this.responseErrorValidation = responseErrorValidation;
+    }
 
     @GetMapping("/")
     public ResponseEntity<UserDTO> getCurrentUser(Principal principal) {

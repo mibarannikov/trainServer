@@ -16,9 +16,9 @@ import java.util.stream.Collectors;
 @Service
 public class CustomUserDetailsService implements UserDetailsService {
 
-    private UserRepository userRepository;
+    private final UserRepository userRepository;
 
-    @Autowired
+
     public CustomUserDetailsService(UserRepository userRepository) {
         this.userRepository = userRepository;
     }
@@ -32,6 +32,13 @@ public class CustomUserDetailsService implements UserDetailsService {
     }
 
     public  User loadUserById(Long id){
+        User user = userRepository.findUserById(id)
+                .orElseThrow(() ->new UsernameNotFoundException("Username not found with id: "+id));
+
+        return  build(user);
+    }
+
+    public  User loadById(Long id){
         return userRepository.findUserById(id).orElse(null);
     }
 

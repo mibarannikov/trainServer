@@ -1,5 +1,6 @@
 package com.tasksbb.train.security;
 
+
 import com.tasksbb.train.service.CustomUserDetailsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -12,7 +13,6 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.crypto.bcrypt.BCrypt;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
@@ -41,7 +41,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
                 .authorizeRequests()
-                .antMatchers(SecurityConstans.SIGN_UP_URL, "/api/train/**")//дописать доступ на url доступа к списку поездов
+                .antMatchers("/api/admin/**").hasRole("ADMIN")
+                .antMatchers(SecurityConstans.SIGN_UP_URL, "/api/train/**")
                 .permitAll()
                 .anyRequest()
                 .authenticated();
