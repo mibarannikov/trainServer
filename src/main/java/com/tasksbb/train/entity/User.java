@@ -8,9 +8,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
 
 //@Data
@@ -44,6 +42,9 @@ public class User implements UserDetails {
 
     @Transient
     private Collection<? extends GrantedAuthority> authorities;
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<TicketEntity> tickets = new ArrayList<>();
 
     public User() {
     }

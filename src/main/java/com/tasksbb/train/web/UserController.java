@@ -5,7 +5,6 @@ import com.tasksbb.train.entity.User;
 import com.tasksbb.train.facade.UserFacade;
 import com.tasksbb.train.service.UserService;
 import com.tasksbb.train.validations.ResponseErrorValidation;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -27,7 +26,9 @@ public class UserController {
 
     private final ResponseErrorValidation responseErrorValidation;
 
-    public UserController(UserService userService, UserFacade userFacade, ResponseErrorValidation responseErrorValidation) {
+    public UserController(UserService userService,
+                          UserFacade userFacade,
+                          ResponseErrorValidation responseErrorValidation) {
         this.userService = userService;
         this.userFacade = userFacade;
         this.responseErrorValidation = responseErrorValidation;

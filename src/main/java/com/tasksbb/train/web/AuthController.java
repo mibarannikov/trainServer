@@ -8,7 +8,6 @@ import com.tasksbb.train.security.JwtTokenProvider;
 import com.tasksbb.train.security.SecurityConstans;
 import com.tasksbb.train.service.UserService;
 import com.tasksbb.train.validations.ResponseErrorValidation;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -17,7 +16,11 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.util.ObjectUtils;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
 
@@ -28,14 +31,24 @@ import javax.validation.Valid;
 public class AuthController {
 
 
-    @Autowired
-    private JwtTokenProvider jwtTokenProvider;
-    @Autowired
-    private AuthenticationManager authenticationManager;
-    @Autowired
-    private ResponseErrorValidation responseErrorValidation;
-    @Autowired
-    private UserService userService;
+
+    private final JwtTokenProvider jwtTokenProvider;
+
+    private final AuthenticationManager authenticationManager;
+
+    private final ResponseErrorValidation responseErrorValidation;
+
+    private final UserService userService;
+
+    public AuthController(JwtTokenProvider jwtTokenProvider,
+                          AuthenticationManager authenticationManager,
+                          ResponseErrorValidation responseErrorValidation,
+                          UserService userService) {
+        this.jwtTokenProvider = jwtTokenProvider;
+        this.authenticationManager = authenticationManager;
+        this.responseErrorValidation = responseErrorValidation;
+        this.userService = userService;
+    }
 
     @PostMapping("/signin")
     public ResponseEntity<Object> authenticateUser(@Valid @RequestBody LoginRequest loginRequest, BindingResult bindingResult) {
