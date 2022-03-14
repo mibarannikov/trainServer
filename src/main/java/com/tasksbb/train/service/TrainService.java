@@ -114,5 +114,5 @@ public class TrainService {
         return emptySeats.stream().map(SeatFacade::seatToSeatDto).collect(Collectors.toList());
 
     }
-    
+
 }
