@@ -1,19 +1,20 @@
 package com.tasksbb.train.entity;
 
-import lombok.AccessLevel;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.hibernate.Hibernate;
 
 import javax.persistence.*;
-import java.util.*;
+import java.util.LinkedHashSet;
+import java.util.Set;
 
 @Entity
 @Table(name = "station_entity")
 @Getter
 @Setter
 @NoArgsConstructor
+@EqualsAndHashCode(exclude = {"canGetStations"})
 public class StationEntity {
     @Id
     @Column(name = "id", nullable = false)
@@ -21,7 +22,7 @@ public class StationEntity {
     private Long id;
 
 
-    @Column(name = "name_station", nullable = false)
+    @Column(name = "name_station", nullable = false, unique = true)
     private String nameStation;
 
 
@@ -32,24 +33,11 @@ public class StationEntity {
     @Column(name = "longitude", nullable = false)
     private Double longitude;
 
-    @ManyToMany(cascade = CascadeType.ALL)
+    @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JoinTable(name = "station_entity_can_get_station",
             joinColumns = @JoinColumn(name = "station_entity_1_id"),
             inverseJoinColumns = @JoinColumn(name = "station_entities_2_id"))
     private Set<StationEntity> canGetStations = new LinkedHashSet<>();
 
 
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || Hibernate.getClass(this) != Hibernate.getClass(o)) return false;
-        StationEntity station = (StationEntity) o;
-        return id != null && Objects.equals(id, station.id);
-    }
-
-    @Override
-    public int hashCode() {
-        return getClass().hashCode();
-    }
 }

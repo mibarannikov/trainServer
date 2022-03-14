@@ -4,16 +4,20 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Getter
 @Setter
 public class TrainDto {
-    private int id;
-    private int trainNumber;
-    private String startStation;
-    private String stopStation;
-    private int seatCapacity;
-    private LocalDateTime start;
-    private LocalDateTime stop;
+    public Long id;
+    private Long trainNumber;
+   // @JsonFormat(pattern = "YYYY-MM-dd HH:mm")
+    private LocalDateTime departureTime;
+    private Double trainSpeed;
+    private Long sumSeats;
+    private Long amountOfEmptySeats;
+    private List<PointOfScheduleDto> pointsOfSchedule = new ArrayList<>();
+
 }
 

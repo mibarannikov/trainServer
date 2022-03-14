@@ -1,8 +1,10 @@
 package com.tasksbb.train.web;
 
+import com.tasksbb.train.dto.TicketDto;
 import com.tasksbb.train.dto.UserDTO;
 import com.tasksbb.train.entity.User;
 import com.tasksbb.train.facade.UserFacade;
+import com.tasksbb.train.service.TicketService;
 import com.tasksbb.train.service.UserService;
 import com.tasksbb.train.validations.ResponseErrorValidation;
 import org.springframework.http.HttpStatus;
@@ -13,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.security.Principal;
+import java.util.List;
 
 @RestController
 @RequestMapping("api/user")
@@ -26,12 +29,16 @@ public class UserController {
 
     private final ResponseErrorValidation responseErrorValidation;
 
+    private final TicketService ticketService;
+
     public UserController(UserService userService,
                           UserFacade userFacade,
-                          ResponseErrorValidation responseErrorValidation) {
+                          ResponseErrorValidation responseErrorValidation,
+                          TicketService ticketService) {
         this.userService = userService;
         this.userFacade = userFacade;
         this.responseErrorValidation = responseErrorValidation;
+        this.ticketService = ticketService;
     }
 
     @GetMapping("/")
@@ -41,4 +48,12 @@ public class UserController {
 
         return new ResponseEntity<>(userDTO, HttpStatus.OK);
     }
+
+    @GetMapping("/tickets")
+    public ResponseEntity<List<TicketDto>> getAllTicketsForUser(Principal principal) {
+        User user = userService.getCurrentUser(principal);
+        List<TicketDto> ticketsUser = ticketService.getAllUserTickets(user);
+        return new ResponseEntity<>(ticketsUser, HttpStatus.OK);
+    }
+
 }

@@ -3,7 +3,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import javax.persistence.*;
-import java.sql.Date;
+import java.time.LocalDate;
 
 @Entity
 @Table(name = "passenger_entity")
@@ -22,7 +22,14 @@ public class PassengerEntity {
     private String lastname;
 
     @Column(name = "date_of_birth", nullable = false)
-    private Date dateOfBirth;
+    private LocalDate dateOfBirth;
 
+   //@OneToOne
+   // private TicketEntity ticketEntity;
+
+
+   // @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
+   // @JoinColumn(name = "ticket_entity_id")
+   // private TicketEntity ticketEntity;
 
 }

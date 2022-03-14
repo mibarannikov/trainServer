@@ -42,7 +42,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .and()
                 .authorizeRequests()
                 .antMatchers("/api/admin/**").hasRole("ADMIN")
-                .antMatchers(SecurityConstans.SIGN_UP_URL, "/api/train/**")
+                .antMatchers(SecurityConstans.SIGN_UP_URL, "/api/train/**","/api/station/**")
                 .permitAll()
                 .anyRequest()
                 .authenticated();

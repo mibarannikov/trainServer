@@ -21,16 +21,33 @@ public class TicketEntity {
     @JoinColumn(name = "seat_entity_id")
     private SeatEntity seatEntity;
 
-    @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
+    @ManyToOne(cascade = CascadeType.ALL,fetch = FetchType.EAGER)
     @JoinColumn(name = "passenger_entity_id")
     private PassengerEntity passengerEntity;
 
-    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
-    @JoinColumn(name = "ticket_entity_id")
-    private List<StationEntity> stationEntities = new ArrayList<>();
+    //@ManyToOne(cascade = CascadeType.ALL, optional = false)
+   // @JoinColumn(name = "train_owner_id", nullable = false)
+    //private TrainEntity trainOwner;
+
+// @ManyToOne(cascade = CascadeType.ALL)
+   // @JoinTable(name = "ticket_entity_train_entities",
+   //         joinColumns = @JoinColumn(name = "ticket_entity_id"),
+   //         inverseJoinColumns = @JoinColumn(name = "train_entities_id"))
+   // private TrainEntity ownerTrain;
+
+    @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @JoinTable(name = "ticket_entity_point_of_schedules",
+            joinColumns = @JoinColumn(name = "ticket_entity_id"),
+            inverseJoinColumns = @JoinColumn(name = "point_of_schedules_id"))
+    private List<PointOfScheduleEntity> pointOfSchedules = new ArrayList<>();
 
     @ManyToOne
     @JoinColumn(name = "user_id")
     private User user;
+
+    @Version
+    private Long version;
+    //@OneToOne(mappedBy = "ticketEntity", cascade = CascadeType.ALL, orphanRemoval = true)
+   // private PassengerEntity passengerEntity;
 
 }

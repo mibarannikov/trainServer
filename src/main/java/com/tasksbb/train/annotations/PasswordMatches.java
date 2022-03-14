@@ -1,4 +1,4 @@
-package  com.tasksbb.train.annotations;
+package com.tasksbb.train.annotations;
 
 import com.tasksbb.train.validations.PasswordMatchesValidator;
 
