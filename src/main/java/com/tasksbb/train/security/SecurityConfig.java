@@ -24,10 +24,15 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
         proxyTargetClass = true
 )
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
-    @Autowired
-    private JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
-    @Autowired
-    private CustomUserDetailsService customUserDetailsService;
+
+    private final JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
+
+    private final  CustomUserDetailsService customUserDetailsService;
+
+    public SecurityConfig(JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint, CustomUserDetailsService customUserDetailsService) {
+        this.jwtAuthenticationEntryPoint = jwtAuthenticationEntryPoint;
+        this.customUserDetailsService = customUserDetailsService;
+    }
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
@@ -41,8 +46,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
                 .authorizeRequests()
-                .antMatchers("/api/admin/**").hasRole("ADMIN")
-                .antMatchers(SecurityConstans.SIGN_UP_URL, "/api/train/**","/api/station/**")
+                .antMatchers(SecurityConstans.ADMIN_URL).hasRole("ADMIN")
+                .antMatchers(SecurityConstans.SIGN_UP_URL, SecurityConstans.TRAIN_URL,SecurityConstans.STATION_URL)
                 .permitAll()
                 .anyRequest()
                 .authenticated();

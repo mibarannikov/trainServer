@@ -27,8 +27,6 @@ public class UserController {
 
     private final UserFacade userFacade;
 
-    private final ResponseErrorValidation responseErrorValidation;
-
     private final TicketService ticketService;
 
     public UserController(UserService userService,
@@ -37,7 +35,6 @@ public class UserController {
                           TicketService ticketService) {
         this.userService = userService;
         this.userFacade = userFacade;
-        this.responseErrorValidation = responseErrorValidation;
         this.ticketService = ticketService;
     }
 
