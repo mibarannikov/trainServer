@@ -29,9 +29,5 @@ public class PointOfScheduleEntity {
     @JoinColumn(name = "train_entity_id", nullable = false)
     private TrainEntity trainEntity;
 
-    //@ManyToOne(cascade = CascadeType.ALL)
-   //@JoinColumn(name = "train_entity_id")
-   // private TrainEntity trainEntity;
-
 
 }

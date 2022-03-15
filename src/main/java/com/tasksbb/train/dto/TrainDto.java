@@ -12,7 +12,6 @@ import java.util.List;
 public class TrainDto {
     public Long id;
     private Long trainNumber;
-   // @JsonFormat(pattern = "YYYY-MM-dd HH:mm")
     private LocalDateTime departureTime;
     private Double trainSpeed;
     private Long sumSeats;

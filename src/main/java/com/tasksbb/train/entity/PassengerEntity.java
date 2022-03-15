@@ -24,12 +24,4 @@ public class PassengerEntity {
     @Column(name = "date_of_birth", nullable = false)
     private LocalDate dateOfBirth;
 
-   //@OneToOne
-   // private TicketEntity ticketEntity;
-
-
-   // @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
-   // @JoinColumn(name = "ticket_entity_id")
-   // private TicketEntity ticketEntity;
-
 }

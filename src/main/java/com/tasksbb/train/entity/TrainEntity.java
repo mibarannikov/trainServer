@@ -29,10 +29,6 @@ public class TrainEntity {
     @Column(name = "train_speed", nullable = false)
     private Double trainSpeed;
 
-    // @OneToMany(mappedBy = "trainEntity", orphanRemoval = true, cascade = CascadeType.ALL, )
-    // private List<PointOfSchedule> pointOfSchedules = new ArrayList<>();
-
-
     @OneToMany(mappedBy = "trainEntity",  cascade = CascadeType.ALL, orphanRemoval = true)
     private List<PointOfScheduleEntity> pointOfSchedules = new ArrayList<>();
 
@@ -42,8 +38,7 @@ public class TrainEntity {
     @Transient
     private Long amountOfEmptySeats;
 
-
-   // @OneToMany(mappedBy = "trainOwner", cascade = CascadeType.ALL, orphanRemoval = true)
-    //private List<TicketEntity> ticketEntities = new ArrayList<>();
+    @Version
+    private Long version;
 
 }

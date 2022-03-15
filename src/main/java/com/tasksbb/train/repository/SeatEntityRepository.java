@@ -12,4 +12,6 @@ public interface SeatEntityRepository extends JpaRepository<SeatEntity, Long> {
     SeatEntity findByTrainEntityTrainNumberAndSeatNumber(Long trainNumber, Long SeatNumber);// todo optional?
 
     List<SeatEntity> findByTrainEntity(TrainEntity train);
+    
+
 }

@@ -115,4 +115,8 @@ public class TrainService {
 
     }
 
+    public List<TrainDto> getAllTrains() {
+        List<TrainEntity> trainEntities = trainEntityRepository.findAllByOrderByDepartureTimeAsc();
+        return trainEntities.stream().map(TrainFacade::trainToDto).collect(Collectors.toList());
+    }
 }
