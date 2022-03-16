@@ -29,6 +29,7 @@ public class PointOfScheduleFacade {
         pointDto.setId(point.getId());
         pointDto.setNameStation(point.getStationEntity().getNameStation());
         pointDto.setArrivalTime(point.getArrivalTime());
+        pointDto.setDepartureTime(point.getDepartureTime());
         return pointDto;
     }
 }

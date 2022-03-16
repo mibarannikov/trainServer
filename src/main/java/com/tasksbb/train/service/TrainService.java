@@ -62,7 +62,7 @@ public class TrainService {
 
     public List<TrainDto> findAllStartEndTimePeriod(String startStationName, String endStationName, LocalDateTime startTimePeriod, LocalDateTime endTimePeriod) {
         List<PointOfScheduleEntity> pointsStart = pointOfScheduleRepository
-                .findAllByStationEntityNameStationAndArrivalTimeAfterAndArrivalTimeBeforeOrderByArrivalTimeAsc(startStationName, startTimePeriod, endTimePeriod);
+                .findByStationEntity_NameStationAndDepartureTimeAfterAndDepartureTimeBeforeOrderByDepartureTimeAsc(startStationName, startTimePeriod, endTimePeriod);
         List<PointOfScheduleEntity> pointsEnd = pointOfScheduleRepository.findAllByStationEntityNameStationOrderByArrivalTimeAsc(endStationName);
         List<TrainEntity> trains = new ArrayList<>();
         for (PointOfScheduleEntity p : pointsStart) {

@@ -13,4 +13,5 @@ public class PointOfScheduleDto {
     private Long id;
     private String nameStation;
     private LocalDateTime arrivalTime;
+    private LocalDateTime departureTime;
 }

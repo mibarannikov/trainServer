@@ -2,7 +2,11 @@ package com.tasksbb.train.service;
 
 import com.tasksbb.train.dto.PointOfScheduleDto;
 import com.tasksbb.train.dto.TicketDto;
-import com.tasksbb.train.entity.*;
+import com.tasksbb.train.entity.PassengerEntity;
+import com.tasksbb.train.entity.PointOfScheduleEntity;
+import com.tasksbb.train.entity.SeatEntity;
+import com.tasksbb.train.entity.TicketEntity;
+import com.tasksbb.train.entity.User;
 import com.tasksbb.train.facade.TicketFacade;
 import com.tasksbb.train.repository.*;
 import org.springframework.stereotype.Service;
@@ -57,6 +61,11 @@ public class TicketService {
                         ticketDto.getFirstnamePassenger(),
                         ticketDto.getLastnamePassenger(),
                         ticketDto.getDateOfBirth());
+        for (PointOfScheduleDto name : ticketDto.getNameStations()) {
+            newTicket.getPointOfSchedules()
+                    .add(pointOfScheduleRepository.findByTrainEntityAndStationEntityNameStation(seat.getTrainEntity(), name.getNameStation()));// todo orElseThrow()
+        }
+        newTicket.getPointOfSchedules().remove(newTicket.getPointOfSchedules().size() - 1);
         if (passenger.isEmpty()) {
             PassengerEntity pass = new PassengerEntity();
             pass.setFirstname(ticketDto.getFirstnamePassenger());
@@ -64,7 +73,7 @@ public class TicketService {
             pass.setDateOfBirth(ticketDto.getDateOfBirth());
             newTicket.setPassengerEntity(pass);
         } else {
-            if (passengerService.passengerIsPresent(seat.getTrainEntity(), passenger.get())) {
+            if (passengerService.passengerIsPresent(seat.getTrainEntity(), passenger.get(), newTicket.getPointOfSchedules())) {
                 ticketDto.setId(0L);
                 return ticketDto;
             }
@@ -72,11 +81,6 @@ public class TicketService {
         }
         newTicket.setUser(user);
         newTicket.setSeatEntity(seat);
-        for (PointOfScheduleDto name : ticketDto.getNameStations()) {
-            newTicket.getPointOfSchedules()
-                    .add(pointOfScheduleRepository.findByTrainEntityAndStationEntityNameStation(seat.getTrainEntity(), name.getNameStation()));// todo orElseThrow()
-        }
-        newTicket.getPointOfSchedules().remove(newTicket.getPointOfSchedules().size() - 1);
         newTicket = ticketEntityRepository.save(newTicket);
         return TicketFacade.ticketToTicketDto(newTicket);
     }

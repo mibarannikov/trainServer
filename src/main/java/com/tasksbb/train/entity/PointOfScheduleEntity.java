@@ -25,6 +25,10 @@ public class PointOfScheduleEntity {
     @Column(name = "arrival_time")
     private LocalDateTime arrivalTime;
 
+    @JsonFormat(pattern = "dd-mm-yyyy HH:mm")
+    @Column(name = "departure_time")
+    private LocalDateTime departureTime;
+
     @ManyToOne(cascade = CascadeType.ALL, optional = false,fetch = FetchType.EAGER)
     @JoinColumn(name = "train_entity_id", nullable = false)
     private TrainEntity trainEntity;
