@@ -84,13 +84,18 @@ public class TicketService {
     public List<TicketDto> getAllUserTickets(User user, String param) {
         List<TicketEntity> tickets = ticketEntityRepository.findAllByUser(user);
         if (Objects.equals(param, "act")) {
-            tickets = tickets.stream().filter(tk -> tk.getPointOfSchedules().get(0).getArrivalTime().isAfter(LocalDateTime.now())).collect(Collectors.toList());
+            tickets = tickets.stream()
+                    .filter(tk -> tk.getPointOfSchedules()
+                            .get(0)
+                            .getArrivalTime()
+                            .isAfter(LocalDateTime.now()))
+                    .collect(Collectors.toList());
         }
         return tickets.stream().map(TicketFacade::ticketToTicketDto).collect(Collectors.toList());
     }
 
     private boolean timeValidationTicket(TicketDto ticketDto) {
-        return ticketDto.getNameStations().get(0).getArrivalTime().isAfter(LocalDateTime.now().plusMinutes(10));
+        return ticketDto.getNameStations().get(0).getArrivalTime().isAfter(LocalDateTime.now().plusMinutes(10));// todo null
     }
 
     @Transactional
@@ -113,7 +118,9 @@ public class TicketService {
         //        }
         //    }
         //}
-        return tickets.stream().map(TicketFacade::ticketToTicketDto).collect(Collectors.toList());
+        return tickets.stream()
+                .map(TicketFacade::ticketToTicketDto)
+                .collect(Collectors.toList());
     }
 
     // private boolean registeredTicket(TicketEntity ticket) {

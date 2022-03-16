@@ -17,6 +17,5 @@ public class TrainDto {
     private Long sumSeats;
     private Long amountOfEmptySeats;
     private List<PointOfScheduleDto> pointsOfSchedule = new ArrayList<>();
-
 }
 
