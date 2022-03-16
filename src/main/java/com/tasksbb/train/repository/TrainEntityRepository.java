@@ -10,7 +10,6 @@ public interface TrainEntityRepository extends JpaRepository<TrainEntity, Long> 
 
     Optional<TrainEntity> findByTrainNumber(Long trainNumber);
     List<TrainEntity> findAllByOrderByDepartureTimeAsc();
-    //TrainEntity findBySeatEntities
 
 
 

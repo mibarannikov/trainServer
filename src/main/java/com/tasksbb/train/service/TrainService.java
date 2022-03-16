@@ -112,11 +112,18 @@ public class TrainService {
                 .findByTrainEntityAndStationEntityNameStation(train, endStation);
         List<SeatEntity> emptySeats = emptySeats(train, pointStart, pointEnd);
         return emptySeats.stream().map(SeatFacade::seatToSeatDto).collect(Collectors.toList());
-
     }
 
     public List<TrainDto> getAllTrains() {
         List<TrainEntity> trainEntities = trainEntityRepository.findAllByOrderByDepartureTimeAsc();
         return trainEntities.stream().map(TrainFacade::trainToDto).collect(Collectors.toList());
+    }
+
+    public List<TrainDto> getTrainSchedule(String nameStation) {
+        List<PointOfScheduleEntity> points = pointOfScheduleRepository
+                .findAllByStationEntityNameStationAndArrivalTimeAfterOrderByArrivalTime(nameStation,LocalDateTime.now());
+
+
+        return points.stream().map(point->{return TrainFacade.trainToDto(point.getTrainEntity());}).collect(Collectors.toList());
     }
 }

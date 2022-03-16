@@ -10,19 +10,19 @@ import java.time.LocalDateTime;
 @Component
 public class PointOfScheduleFacade {
 
-    public final StationEntityRepository stationEntityRepository;
+//    public final StationEntityRepository stationEntityRepository;
 
-    public PointOfScheduleFacade(StationEntityRepository stationEntityRepository) {
-        this.stationEntityRepository = stationEntityRepository;
+    public PointOfScheduleFacade() {
+//        this.stationEntityRepository = stationEntityRepository;
     }
 
-    public PointOfScheduleEntity dtoToPointOfScheduleEntity(LocalDateTime time, String nameStation) {
-
-        PointOfScheduleEntity pointOfSchedule = new PointOfScheduleEntity();
-        pointOfSchedule.setArrivalTime(time);
-        pointOfSchedule.setStationEntity(stationEntityRepository.findByNameStation(nameStation));
-        return pointOfSchedule;
-    }
+//    public PointOfScheduleEntity dtoToPointOfScheduleEntity(LocalDateTime time, String nameStation) {
+//
+//        PointOfScheduleEntity pointOfSchedule = new PointOfScheduleEntity();
+//        pointOfSchedule.setArrivalTime(time);
+//        pointOfSchedule.setStationEntity(stationEntityRepository.findByNameStation(nameStation));
+//        return pointOfSchedule;
+//    }
 
     public static PointOfScheduleDto pointEntityToPointDto(PointOfScheduleEntity point) {
         PointOfScheduleDto pointDto = new PointOfScheduleDto();

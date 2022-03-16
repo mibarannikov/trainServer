@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -94,9 +95,13 @@ public class TicketService {
 
     @Transactional
     public List<TicketDto> ticketsOnTheTrainNow(Long trainNumber) {
-        TrainEntity train = trainEntityRepository.findByTrainNumber(trainNumber).get(); //  todo orElseThrow()
+        //TrainEntity train = trainEntityRepository.findByTrainNumber(trainNumber).get(); //  todo orElseThrow()
         List<PointOfScheduleEntity> points = pointOfScheduleRepository
-                .findByTrainEntityAndArrivalTimeBeforeOrderByArrivalTimeAsc(train, LocalDateTime.now());
+                .findByTrainEntityTrainNumberAndArrivalTimeBeforeOrderByArrivalTimeAsc(trainNumber, LocalDateTime.now());
+            if(points.isEmpty()){
+                return new ArrayList<TicketDto>();
+            }
+        //.findByTrainEntityAndArrivalTimeBeforeOrderByArrivalTimeAsc(train, LocalDateTime.now());
         List<TicketEntity> tickets = ticketEntityRepository
                 .findAllByPointOfSchedules(points.get(points.size() - 1));
 

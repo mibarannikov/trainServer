@@ -1,8 +1,11 @@
 package com.tasksbb.train.web;
 
+import com.tasksbb.train.dto.PointOfScheduleDto;
 import com.tasksbb.train.dto.StationDto;
+import com.tasksbb.train.dto.TrainDto;
 import com.tasksbb.train.facade.StationFacade;
 import com.tasksbb.train.service.StationService;
+import com.tasksbb.train.service.TrainService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -19,10 +22,14 @@ public class StationController {
 
     public final StationService stationService;
     public final StationFacade stationFacade;
+    public final TrainService trainService;
 
-    public StationController(StationService stationService, StationFacade stationFacade) {
+    public StationController(StationService stationService,
+                             StationFacade stationFacade,
+                             TrainService trainService) {
         this.stationService = stationService;
         this.stationFacade = stationFacade;
+        this.trainService = trainService;
     }
 
     @GetMapping("/all")
@@ -37,5 +44,13 @@ public class StationController {
         StationDto stationDto = stationService.findByNameStation(name);
 
         return new ResponseEntity<>(stationDto, HttpStatus.OK);
+    }
+    @GetMapping("/stationschedule")
+    public ResponseEntity<List<TrainDto>> stationSchedule(@RequestParam(name="station") String nameStation){
+
+        List<TrainDto> trains = trainService.getTrainSchedule(nameStation);
+
+        return new ResponseEntity<>(trains,HttpStatus.OK);
+
     }
 }
