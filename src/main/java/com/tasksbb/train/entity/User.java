@@ -40,6 +40,11 @@ public class User implements UserDetails {
     @Column(updatable = false)
     private LocalDateTime createDate;
 
+    @PrePersist
+    protected void onCreate() {
+        this.createDate = LocalDateTime.now();
+
+    }
     @Transient
     private Collection<? extends GrantedAuthority> authorities;
 
@@ -49,10 +54,8 @@ public class User implements UserDetails {
     public User() {
     }
 
-    @PrePersist
-    protected void onCreate() {
-        this.createDate = LocalDateTime.now();
-    }
+
+
 
     public User(Long id,
                 String username,
