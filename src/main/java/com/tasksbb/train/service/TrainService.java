@@ -53,6 +53,7 @@ public class TrainService {
         for (int i = 0; i < trainDto.getPointsOfSchedule().size(); i++) {
             PointOfScheduleEntity p = new PointOfScheduleEntity();
             p.setArrivalTime(trainDto.getPointsOfSchedule().get(i).getArrivalTime());
+            p.setDepartureTime(trainDto.getPointsOfSchedule().get(i).getDepartureTime());
             p.setStationEntity(stationEntityRepository.findByNameStation(trainDto.getPointsOfSchedule().get(i).getNameStation()));
             p.setTrainEntity(addTrain);
             addTrain.getPointOfSchedules().add(p);
@@ -67,7 +68,7 @@ public class TrainService {
         List<TrainEntity> trains = new ArrayList<>();
         for (PointOfScheduleEntity p : pointsStart) {
             for (PointOfScheduleEntity pe : pointsEnd) {
-                if ((p.getTrainEntity().getTrainNumber() == pe.getTrainEntity().getTrainNumber()) && (p.getArrivalTime().isBefore(pe.getArrivalTime()))) {
+                if ((p.getTrainEntity().getTrainNumber() == pe.getTrainEntity().getTrainNumber()) && (p.getDepartureTime().isBefore(pe.getArrivalTime()))) {
                     p.getTrainEntity().setAmountOfEmptySeats((long) emptySeats(p.getTrainEntity(), p, pe).size());
                     trains.add(p.getTrainEntity());
                 }
