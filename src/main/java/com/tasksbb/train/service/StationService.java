@@ -26,7 +26,7 @@ public class StationService {
 
     public List<StationEntity> findAllStation() {
 
-        return stationEntityRepository.findAll();
+        return stationEntityRepository.findByOrderByNameStationAsc();
     }
 
     public StationEntity addStation(StationDto stationDto) {

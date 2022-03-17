@@ -10,4 +10,7 @@ public interface StationEntityRepository extends JpaRepository<StationEntity, Lo
 
 StationEntity findByNameStation(String nameStation);
 Optional<List<StationEntity>> findByNameStationContaining(String name);
+
+    List<StationEntity> findByOrderByNameStationAsc();
+
 }
