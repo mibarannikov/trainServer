@@ -13,6 +13,7 @@ public class TrainDto {
     public Long id;
     private Long trainNumber;
     private LocalDateTime departureTime;
+    private LocalDateTime arrivalTimeEnd;
     private Double trainSpeed;
     private Long sumSeats;
     private Long amountOfEmptySeats;

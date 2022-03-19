@@ -54,9 +54,6 @@ public class User implements UserDetails {
     public User() {
     }
 
-
-
-
     public User(Long id,
                 String username,
                 String email,

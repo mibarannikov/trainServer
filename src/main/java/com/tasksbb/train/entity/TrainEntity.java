@@ -13,7 +13,7 @@ import java.util.List;
 @Table(name = "train_entity")
 @Getter
 @Setter
-public class TrainEntity {
+public class TrainEntity extends DateCreateUpdate {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false)
@@ -26,6 +26,10 @@ public class TrainEntity {
     @Column(name = "departure", nullable = false)
     private LocalDateTime departureTime;
 
+    @JsonFormat(pattern = "dd-mm-yyyy HH:mm")
+    @Column(name = "arrival_time_end")
+    private LocalDateTime arrivalTimeEnd;
+
     @Column(name = "train_speed", nullable = false)
     private Double trainSpeed;
 
@@ -37,8 +41,5 @@ public class TrainEntity {
 
     @Transient
     private Long amountOfEmptySeats;
-
-    @Version
-    private Long version;
 
 }

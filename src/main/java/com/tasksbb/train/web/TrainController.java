@@ -19,9 +19,12 @@ import java.util.List;
 @PreAuthorize("permitAll()")
 public class TrainController {
 
-    @Autowired
-    private TrainService trainService;
 
+    private final TrainService trainService;
+
+    public TrainController(TrainService trainService) {
+        this.trainService = trainService;
+    }
 
     @GetMapping("/search")
     public ResponseEntity<List<TrainDto>> trains(@RequestParam(name = "start") String startStationName,
@@ -35,15 +38,15 @@ public class TrainController {
         return new ResponseEntity<>(trains, HttpStatus.OK);
     }
 
-    @GetMapping("/freeseats")
-    public
-    ResponseEntity<List<SeatEntityDto>> getFreeSeats(@RequestParam(name = "train") Long trainNumber,
-                                                     @RequestParam(name = "start") String startStation,
-                                                     @RequestParam(name = "end") String endStation){
-        List<SeatEntityDto> seats = new ArrayList<>();
-      //  seats = trainService.findAllFreeSeats(trainNumber,startStation,endStation);
-        return new ResponseEntity<>(seats, HttpStatus.OK);
-    }
+//    @GetMapping("/freeseats")
+//    public
+//    ResponseEntity<List<SeatEntityDto>> getFreeSeats(@RequestParam(name = "train") Long trainNumber,
+//                                                     @RequestParam(name = "start") String startStation,
+//                                                     @RequestParam(name = "end") String endStation){
+//        List<SeatEntityDto> seats = new ArrayList<>();
+//      //  seats = trainService.findAllFreeSeats(trainNumber,startStation,endStation);
+//        return new ResponseEntity<>(seats, HttpStatus.OK);
+//    }
 
 
 

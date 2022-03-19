@@ -42,9 +42,9 @@ public class TicketController {
 
     @PostMapping("/buyticket")
     ResponseEntity<Object> buyTicket(@RequestBody TicketDto ticket, BindingResult bindingResult, Principal principal) {
-
-        ResponseEntity<Object> errors = responseErrorValidation.mapValidationService(bindingResult);
-        if (!ObjectUtils.isEmpty(errors)) return errors;
+        responseErrorValidation.mapValidationService(bindingResult);
+//        ResponseEntity<Object> errors = responseErrorValidation.mapValidationService(bindingResult);
+//        if (!ObjectUtils.isEmpty(errors)) return errors;
         User user = userService.getCurrentUser(principal);
 
         TicketDto boughtTicket = ticketService.buyTicket(ticket, user);

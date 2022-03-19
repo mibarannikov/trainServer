@@ -14,6 +14,8 @@ import com.tasksbb.train.repository.SeatEntityRepository;
 import com.tasksbb.train.repository.StationEntityRepository;
 import com.tasksbb.train.repository.TrainEntityRepository;
 import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -25,16 +27,16 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 @Service
 public class TrainService {
-
+    public static final Logger LOG = LoggerFactory.getLogger(TrainService.class);
     private final TrainEntityRepository trainEntityRepository;
 
     private final SeatEntityRepository seatEntityRepository;
 
-    private final  PointOfScheduleFacade pointOfScheduleFacade;
+    private final PointOfScheduleFacade pointOfScheduleFacade;
 
-    private  final StationEntityRepository stationEntityRepository;
+    private final StationEntityRepository stationEntityRepository;
 
-    private  final PointOfScheduleRepository pointOfScheduleRepository;
+    private final PointOfScheduleRepository pointOfScheduleRepository;
 
     @Transactional
     public TrainEntity addTrain(TrainDto trainDto) {
@@ -62,6 +64,7 @@ public class TrainService {
     }
 
     public List<TrainDto> findAllStartEndTimePeriod(String startStationName, String endStationName, LocalDateTime startTimePeriod, LocalDateTime endTimePeriod) {
+
         List<PointOfScheduleEntity> pointsStart = pointOfScheduleRepository
                 .findByStationEntity_NameStationAndDepartureTimeAfterAndDepartureTimeBeforeOrderByDepartureTimeAsc(startStationName, startTimePeriod, endTimePeriod);
         List<PointOfScheduleEntity> pointsEnd = pointOfScheduleRepository.findAllByStationEntityNameStationOrderByArrivalTimeAsc(endStationName);
@@ -77,6 +80,15 @@ public class TrainService {
 
         return trains.stream().map(TrainFacade::trainToDto).collect(Collectors.toList());
     }
+
+//    private void trainScript(){
+//       List<TrainEntity> trains = trainEntityRepository.findAll();
+//       trains.forEach(train -> {
+//           train.setArrivalTimeEnd(train.getPointOfSchedules().get(train.getPointOfSchedules().size()-1).getArrivalTime());
+//           LOG.info(train.getTrainNumber().toString()+" "+train.getArrivalTimeEnd().toString());
+//           trainEntityRepository.save(train);
+//       });
+//    }
 
     public List<SeatEntity> emptySeats(TrainEntity train, PointOfScheduleEntity pointStart, PointOfScheduleEntity pointEnd) {
         List<PointOfScheduleEntity> pointOfTrain = pointOfScheduleRepository.findAllByTrainEntityOrderByArrivalTimeAsc(train);
@@ -122,9 +134,17 @@ public class TrainService {
 
     public List<TrainDto> getTrainSchedule(String nameStation) {
         List<PointOfScheduleEntity> points = pointOfScheduleRepository
-                .findAllByStationEntityNameStationAndArrivalTimeAfterOrderByArrivalTime(nameStation,LocalDateTime.now());
+                .findAllByStationEntityNameStationAndArrivalTimeAfterOrderByArrivalTime(nameStation, LocalDateTime.now());
 
+        LOG.info("time now " + LocalDateTime.now());
+        return points.stream().map(point -> {
+            return TrainFacade.trainToDto(point.getTrainEntity());
+        }).collect(Collectors.toList());
+    }
 
-        return points.stream().map(point->{return TrainFacade.trainToDto(point.getTrainEntity());}).collect(Collectors.toList());
+    public List<TrainDto> getAllActTrains() {
+        return trainEntityRepository.findByArrivalTimeEndAfter(LocalDateTime.now()).stream()
+                .map(TrainFacade::trainToDto)
+                .collect(Collectors.toList());
     }
 }

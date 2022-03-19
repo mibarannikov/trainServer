@@ -18,12 +18,12 @@ public class TicketFacade {
         ticketDto.setDateOfBirth(ticket.getPassengerEntity().getDateOfBirth());
         ticketDto.setSeatNumber(ticket.getSeatEntity().getSeatNumber());
         ticketDto.setNumberTrainOwner(ticket.getSeatEntity().getTrainEntity().getTrainNumber());
-        List<PointOfScheduleEntity> points = new ArrayList<>();
-        for(PointOfScheduleEntity p: ticket.getSeatEntity().getTrainEntity().getPointOfSchedules()){
-            if(p.getArrivalTime().isAfter(ticket.getPointOfSchedules().get(ticket.getPointOfSchedules().size()-1).getArrivalTime())){
-                ticket.getPointOfSchedules().add(p);break;
-            }
-        }
+//        List<PointOfScheduleEntity> points = new ArrayList<>();
+//        for(PointOfScheduleEntity p: ticket.getSeatEntity().getTrainEntity().getPointOfSchedules()){
+//            if(p.getArrivalTime().isAfter(ticket.getPointOfSchedules().get(ticket.getPointOfSchedules().size()-1).getArrivalTime())){
+//                ticket.getPointOfSchedules().add(p);break;
+//            }
+//        }
         ticketDto.setNameStations(ticket.getPointOfSchedules()
                 .stream()
                 .map(PointOfScheduleFacade::pointEntityToPointDto)

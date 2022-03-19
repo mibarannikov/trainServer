@@ -15,7 +15,8 @@ public class StationService {
     public final StationFacade stationFacade;
     public final StationEntityRepository stationEntityRepository;
 
-    public StationService(StationFacade stationFacade, StationEntityRepository stationEntityRepository) {
+    public StationService(StationFacade stationFacade,
+                          StationEntityRepository stationEntityRepository) {
         this.stationFacade = stationFacade;
         this.stationEntityRepository = stationEntityRepository;
     }
@@ -39,9 +40,6 @@ public class StationService {
                 station.getCanGetStations().add(stationEntityRepository.findByNameStation(s));
             }
             station.getCanGetStations().forEach(st -> st.getCanGetStations().add(station));
-            //  .stream()
-            //  .map(st -> st.getCanGetStations().add(station))
-            //  .collect(Collectors.toSet());
             return stationEntityRepository.save(station);
         }
         station.setCanGetStations(new LinkedHashSet<>());

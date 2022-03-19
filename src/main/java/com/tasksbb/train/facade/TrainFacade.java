@@ -14,6 +14,7 @@ public class TrainFacade {
         trainDto.setTrainNumber(train.getTrainNumber());
         trainDto.setTrainSpeed(train.getTrainSpeed());
         trainDto.setDepartureTime(train.getDepartureTime());
+        trainDto.setArrivalTimeEnd(train.getArrivalTimeEnd());
         trainDto.setSumSeats((long)train.getSeatEntities().size());
         trainDto.setPointsOfSchedule(train.getPointOfSchedules().stream().map(PointOfScheduleFacade::pointEntityToPointDto).collect(Collectors.toList()));
         trainDto.setAmountOfEmptySeats(train.getAmountOfEmptySeats());

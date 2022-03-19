@@ -39,8 +39,8 @@ public class PassengerService {
         for (SeatEntity st : seats) {
             for (TicketEntity tk : st.getTickets()) {
                 if (tk.getPassengerEntity().equals(passenger)
-                        &&points.get(0).getArrivalTime().isBefore(tk.getPointOfSchedules().get(tk.getPointOfSchedules().size()-1).getDepartureTime())
-                        &&points.get(points.size()-1).getDepartureTime().isAfter(tk.getPointOfSchedules().get(0).getArrivalTime())){
+                        &&points.get(0).getDepartureTime().isBefore(tk.getPointOfSchedules().get(tk.getPointOfSchedules().size()-1).getArrivalTime())
+                        &&points.get(points.size()-1).getArrivalTime().isAfter(tk.getPointOfSchedules().get(0).getDepartureTime())){
                     return true;
                 }
             }

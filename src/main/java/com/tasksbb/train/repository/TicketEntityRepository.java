@@ -21,6 +21,11 @@ public interface TicketEntityRepository extends JpaRepository<TicketEntity, Long
 
     long countByPassengerEntityAndPointOfSchedules_DepartureTimeAfterAndPointOfSchedules_ArrivalTimeBeforeAndPointOfSchedules_TrainEntity(PassengerEntity passengerEntity, LocalDateTime arrivalTime, LocalDateTime departureTime, TrainEntity trainEntity);
 
+    List<TicketEntity> findBySeatEntity_TrainEntity(TrainEntity trainEntity);
+
+    List<TicketEntity> findBySeatEntity_TrainEntity_TrainNumber(Long trainNumber);
+
+
 
 
 }

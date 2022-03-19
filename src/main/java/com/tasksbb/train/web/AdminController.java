@@ -13,7 +13,13 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.ObjectUtils;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
@@ -44,10 +50,10 @@ public class AdminController {
     @PostMapping("/station/add")
     public ResponseEntity<Object> addStation(@RequestBody StationDto stationDto,
                                              BindingResult bindingResult) {
-        ResponseEntity<Object> errors = responseErrorValidation.mapValidationService(bindingResult);
-        if (!ObjectUtils.isEmpty(errors)) {
-            return errors;
-        }
+        responseErrorValidation.mapValidationService(bindingResult);
+//        if (!ObjectUtils.isEmpty(errors)) {
+//            return errors;
+//        }
         StationEntity station = stationService.addStation(stationDto);
         return new ResponseEntity<>(stationFacade.stationToStationDto(station), HttpStatus.OK);
     }
@@ -55,22 +61,33 @@ public class AdminController {
     @PostMapping("/train/add")
     public ResponseEntity<Object> addTrain(@RequestBody TrainDto trainDto,
                                            BindingResult bindingResult) {
-        ResponseEntity<Object> errors = responseErrorValidation.mapValidationService(bindingResult);
-        if (!ObjectUtils.isEmpty(errors)) {
-            return errors;
-        }
+        responseErrorValidation.mapValidationService(bindingResult);
+//        ResponseEntity<Object> errors =
+//        if (!ObjectUtils.isEmpty(errors)) {
+//            return errors;
+//        }
         TrainEntity train = trainService.addTrain(trainDto);
         return new ResponseEntity<>(train.getTrainNumber(), HttpStatus.OK);
     }
 
     @GetMapping("/train/all")
-    public ResponseEntity<Object> getAllTrains() {
+    public ResponseEntity<List<TrainDto>> getAllTrains() {
         List<TrainDto> trains = trainService.getAllTrains();
         return new ResponseEntity<>(trains, HttpStatus.OK);
     }
 
+    @GetMapping("/train/allact")
+    public  ResponseEntity<List<TrainDto>> getAllActTrains(){
+        return new ResponseEntity<>(trainService.getAllActTrains(),HttpStatus.OK);
+    }
+
+    @GetMapping("/alltickets")
+    public ResponseEntity<Object> getAllTrainTickets(@RequestParam(name = "train") Long trainNumber){
+        return new ResponseEntity<>(ticketService.AllTrainTickets(trainNumber), HttpStatus.OK);
+
+    }
     @GetMapping("/regtickets")
-    public ResponseEntity<Object> getRegTicketsOfTrain(@RequestParam(name = "train") Long trainNumber) {
+    public ResponseEntity<Object> getRegTrainTickets(@RequestParam(name = "train") Long trainNumber) {
 
         return new ResponseEntity<>(ticketService.ticketsOnTheTrainNow(trainNumber), HttpStatus.OK);
     }
