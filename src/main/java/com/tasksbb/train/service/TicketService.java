@@ -3,6 +3,7 @@ package com.tasksbb.train.service;
 import com.tasksbb.train.dto.PointOfScheduleDto;
 import com.tasksbb.train.dto.TicketDto;
 import com.tasksbb.train.entity.*;
+import com.tasksbb.train.ex.ScheduleNotFoundException;
 import com.tasksbb.train.facade.TicketFacade;
 import com.tasksbb.train.repository.*;
 import org.springframework.stereotype.Service;
@@ -55,7 +56,8 @@ public class TicketService {
 
         for (PointOfScheduleDto name : ticketDto.getNameStations()) {
             newTicket.getPointOfSchedules()
-                    .add(pointOfScheduleRepository.findByTrainEntityAndStationEntityNameStation(seat.getTrainEntity(), name.getNameStation()));// todo orElseThrow()
+                    .add(pointOfScheduleRepository.findByTrainEntityAndStationEntityNameStation(seat.getTrainEntity(), name.getNameStation())
+                            .orElseThrow(()->new ScheduleNotFoundException("Not found point of schedule for train number"+seat.getTrainEntity().getTrainNumber()+" and station " +name.getNameStation())));// todo orElseThrow()
         }
         //newTicket.getPointOfSchedules().remove(newTicket.getPointOfSchedules().size() - 1);//?
 
@@ -100,7 +102,7 @@ public class TicketService {
     }
 
     private boolean timeValidationTicket(TicketDto ticketDto) {
-        return ticketDto.getNameStations().get(0).getDepartureTime().isAfter(LocalDateTime.now().plusMinutes(10));// todo null
+        return ticketDto.getNameStations().get(0).getDepartureTime().isAfter(LocalDateTime.now().plusMinutes(10));
     }
 
     public List<TicketDto> AllTrainTickets(Long trainNumber) {
@@ -110,13 +112,11 @@ public class TicketService {
 
     @Transactional
     public List<TicketDto> ticketsOnTheTrainNow(Long trainNumber) {
-        //TrainEntity train = trainEntityRepository.findByTrainNumber(trainNumber).get(); //  todo orElseThrow()
         List<PointOfScheduleEntity> points = pointOfScheduleRepository
                 .findByTrainEntityTrainNumberAndDepartureTimeBeforeOrderByArrivalTimeAsc(trainNumber, LocalDateTime.now());
         if (points.isEmpty()) {
             return new ArrayList<TicketDto>();// todo exception
         }
-        //.findByTrainEntityAndArrivalTimeBeforeOrderByArrivalTimeAsc(train, LocalDateTime.now());
         List<TicketEntity> tickets = ticketEntityRepository
                 .findAllByPointOfSchedules(points.get(points.size() - 1));
         // tickets =tickets.stream().filter(t -> t.getPointOfSchedules().get(t.getPointOfSchedules().size()-1)!=points.get(points.size()-1)).collect(Collectors.toList());

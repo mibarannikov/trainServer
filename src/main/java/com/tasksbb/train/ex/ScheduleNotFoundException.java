@@ -5,8 +5,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
 @ResponseStatus(HttpStatus.BAD_REQUEST)
-public class ScheduleExistException extends RuntimeException {
-    public ScheduleExistException(String msg) {
+public class ScheduleNotFoundException extends RuntimeException {
+    public ScheduleNotFoundException(String msg) {
         super(msg);
     }
 }

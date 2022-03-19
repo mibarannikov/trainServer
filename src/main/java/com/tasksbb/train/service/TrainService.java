@@ -6,6 +6,8 @@ import com.tasksbb.train.entity.PointOfScheduleEntity;
 import com.tasksbb.train.entity.SeatEntity;
 import com.tasksbb.train.entity.TicketEntity;
 import com.tasksbb.train.entity.TrainEntity;
+import com.tasksbb.train.ex.ScheduleNotFoundException;
+import com.tasksbb.train.ex.TrainNotFoundException;
 import com.tasksbb.train.facade.PointOfScheduleFacade;
 import com.tasksbb.train.facade.SeatFacade;
 import com.tasksbb.train.facade.TrainFacade;
@@ -118,11 +120,14 @@ public class TrainService {
     }
 
     public List<SeatEntityDto> getEmptySeats(Long trainNumber, String startStation, String endStation) {
-        TrainEntity train = trainEntityRepository.findByTrainNumber(trainNumber).get(); // todo optional?
+        TrainEntity train = trainEntityRepository.findByTrainNumber(trainNumber)
+                .orElseThrow(()->new TrainNotFoundException("Train with trainNumber "+ trainNumber + "not found"));
         PointOfScheduleEntity pointStart = pointOfScheduleRepository
-                .findByTrainEntityAndStationEntityNameStation(train, startStation);
+                .findByTrainEntityAndStationEntityNameStation(train, startStation)
+                .orElseThrow(()->new ScheduleNotFoundException("Point Of Schedule with station name "+startStation+" and train number"+ train.getTrainNumber()+"not found"));
         PointOfScheduleEntity pointEnd = pointOfScheduleRepository
-                .findByTrainEntityAndStationEntityNameStation(train, endStation);
+                .findByTrainEntityAndStationEntityNameStation(train, endStation)
+                .orElseThrow(()->new ScheduleNotFoundException("Point Of Schedule with station name "+startStation+" and train number"+ train.getTrainNumber()+"not found"));
         List<SeatEntity> emptySeats = emptySeats(train, pointStart, pointEnd);
         return emptySeats.stream().map(SeatFacade::seatToSeatDto).collect(Collectors.toList());
     }
@@ -137,9 +142,9 @@ public class TrainService {
                 .findAllByStationEntityNameStationAndArrivalTimeAfterOrderByArrivalTime(nameStation, LocalDateTime.now());
 
         LOG.info("time now " + LocalDateTime.now());
-        return points.stream().map(point -> {
-            return TrainFacade.trainToDto(point.getTrainEntity());
-        }).collect(Collectors.toList());
+        return points.stream()
+                .map(point -> TrainFacade.trainToDto(point.getTrainEntity()))
+                .collect(Collectors.toList());
     }
 
     public List<TrainDto> getAllActTrains() {

@@ -14,6 +14,7 @@ import org.springframework.util.ObjectUtils;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.security.Principal;
 import java.util.List;
 
@@ -41,7 +42,7 @@ public class TicketController {
     }
 
     @PostMapping("/buyticket")
-    ResponseEntity<Object> buyTicket(@RequestBody TicketDto ticket, BindingResult bindingResult, Principal principal) {
+    ResponseEntity<Object> buyTicket(@Valid @RequestBody  TicketDto ticket, BindingResult bindingResult, Principal principal) {
         responseErrorValidation.mapValidationService(bindingResult);
 //        ResponseEntity<Object> errors = responseErrorValidation.mapValidationService(bindingResult);
 //        if (!ObjectUtils.isEmpty(errors)) return errors;

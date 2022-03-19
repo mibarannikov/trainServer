@@ -1,17 +1,18 @@
 package com.tasksbb.train.web;
 
 import com.tasksbb.train.dto.StationDto;
+import com.tasksbb.train.dto.TicketDto;
 import com.tasksbb.train.dto.TrainDto;
 import com.tasksbb.train.entity.StationEntity;
 import com.tasksbb.train.entity.TrainEntity;
 import com.tasksbb.train.facade.StationFacade;
+import com.tasksbb.train.facade.TrainFacade;
 import com.tasksbb.train.service.StationService;
 import com.tasksbb.train.service.TicketService;
 import com.tasksbb.train.service.TrainService;
 import com.tasksbb.train.validations.ResponseErrorValidation;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.util.ObjectUtils;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -21,6 +22,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.validation.Valid;
 import java.util.List;
 
 @RestController
@@ -48,7 +50,7 @@ public class AdminController {
     }
 
     @PostMapping("/station/add")
-    public ResponseEntity<Object> addStation(@RequestBody StationDto stationDto,
+    public ResponseEntity<StationDto> addStation(@Valid @RequestBody StationDto stationDto,
                                              BindingResult bindingResult) {
         responseErrorValidation.mapValidationService(bindingResult);
 //        if (!ObjectUtils.isEmpty(errors)) {
@@ -59,7 +61,7 @@ public class AdminController {
     }
 
     @PostMapping("/train/add")
-    public ResponseEntity<Object> addTrain(@RequestBody TrainDto trainDto,
+    public ResponseEntity<TrainDto> addTrain(@Valid @RequestBody TrainDto trainDto,
                                            BindingResult bindingResult) {
         responseErrorValidation.mapValidationService(bindingResult);
 //        ResponseEntity<Object> errors =
@@ -67,7 +69,7 @@ public class AdminController {
 //            return errors;
 //        }
         TrainEntity train = trainService.addTrain(trainDto);
-        return new ResponseEntity<>(train.getTrainNumber(), HttpStatus.OK);
+        return new ResponseEntity<>(TrainFacade.trainToDto(train), HttpStatus.OK);
     }
 
     @GetMapping("/train/all")
@@ -82,12 +84,12 @@ public class AdminController {
     }
 
     @GetMapping("/alltickets")
-    public ResponseEntity<Object> getAllTrainTickets(@RequestParam(name = "train") Long trainNumber){
+    public ResponseEntity<List<TicketDto>> getAllTrainTickets(@RequestParam(name = "train") Long trainNumber){
         return new ResponseEntity<>(ticketService.AllTrainTickets(trainNumber), HttpStatus.OK);
 
     }
     @GetMapping("/regtickets")
-    public ResponseEntity<Object> getRegTrainTickets(@RequestParam(name = "train") Long trainNumber) {
+    public ResponseEntity<List<TicketDto>> getRegTrainTickets(@RequestParam(name = "train") Long trainNumber) {
 
         return new ResponseEntity<>(ticketService.ticketsOnTheTrainNow(trainNumber), HttpStatus.OK);
     }

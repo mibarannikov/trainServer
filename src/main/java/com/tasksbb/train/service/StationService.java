@@ -2,6 +2,7 @@ package com.tasksbb.train.service;
 
 import com.tasksbb.train.dto.StationDto;
 import com.tasksbb.train.entity.StationEntity;
+import com.tasksbb.train.ex.StationNotFoundException;
 import com.tasksbb.train.facade.StationFacade;
 import com.tasksbb.train.repository.StationEntityRepository;
 import org.springframework.stereotype.Service;
@@ -37,7 +38,8 @@ public class StationService {
         station.setLongitude(stationDto.getLongitude());
         if ((stationDto.getCanGetStation().size() != 0) && (stationDto.getCanGetStation() != null)) {
             for (String s : stationDto.getCanGetStation()) {
-                station.getCanGetStations().add(stationEntityRepository.findByNameStation(s));
+                station.getCanGetStations().add(stationEntityRepository.findByNameStation(s)
+                        .orElseThrow(()-> new StationNotFoundException("Station with name "+s+" not found")));
             }
             station.getCanGetStations().forEach(st -> st.getCanGetStations().add(station));
             return stationEntityRepository.save(station);
@@ -48,7 +50,8 @@ public class StationService {
     }
 
     public StationDto findByNameStation(String name) {
-        StationEntity station = stationEntityRepository.findByNameStation(name);
+        StationEntity station = stationEntityRepository.findByNameStation(name)
+                .orElseThrow(()-> new StationNotFoundException("Station with name "+name+" not found"));
         return stationFacade.stationToStationDto(station);
 
     }
