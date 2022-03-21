@@ -1,6 +1,7 @@
 package com.tasksbb.train.security;
 
 import com.tasksbb.train.entity.User;
+import com.tasksbb.train.ex.MyExpiredJwtException;
 import com.tasksbb.train.service.CustomUserDetailsService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -43,6 +44,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             }
         } catch (Exception e){
             LOG.error("Could not set user authentication");
+            throw new MyExpiredJwtException(e.getMessage());
         }
 
         filterChain.doFilter(request,response);

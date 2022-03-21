@@ -5,25 +5,20 @@ import com.tasksbb.train.repository.PassengerEntityRepository;
 import com.tasksbb.train.repository.SeatEntityRepository;
 import com.tasksbb.train.repository.TicketEntityRepository;
 import com.tasksbb.train.repository.TrainEntityRepository;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
+@RequiredArgsConstructor
 public class PassengerService {
 
     public final TicketEntityRepository ticketEntityRepository;
     public final PassengerEntityRepository passengerEntityRepository;
     public final TrainEntityRepository trainEntityRepository;
     public final SeatEntityRepository seatEntityRepository;
-
-    public PassengerService(TicketEntityRepository ticketEntityRepository, PassengerEntityRepository passengerEntityRepository, TrainEntityRepository trainEntityRepository, SeatEntityRepository seatEntityRepository) {
-        this.ticketEntityRepository = ticketEntityRepository;
-        this.passengerEntityRepository = passengerEntityRepository;
-        this.trainEntityRepository = trainEntityRepository;
-        this.seatEntityRepository = seatEntityRepository;
-    }
 
     public Boolean passengerIsPresent(TrainEntity train, PassengerEntity passenger, List<PointOfScheduleEntity> points) {
         List<SeatEntity> seats = seatEntityRepository.findByTrainEntity(train);

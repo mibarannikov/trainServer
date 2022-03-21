@@ -46,7 +46,7 @@ class TrainApplicationTests {
         seat.setSeatNumber(10L);
         seat.setTrainEntity(train);
         PointOfScheduleEntity point = new PointOfScheduleEntity();
-        point.setStationEntity(stationEntityRepository.findByNameStation("f"));
+        point.setStationEntity(stationEntityRepository.findByNameStation("f").get());
         point.setArrivalTime(LocalDateTime.now());
         point.setTrainEntity(train);
         train.getPointOfSchedules().add(point);
@@ -66,7 +66,7 @@ class TrainApplicationTests {
 
     @Test
     void test3() {
-        StationEntity station = stationEntityRepository.findByNameStation("b");
+         StationEntity station = stationEntityRepository.findByNameStation("b").get();
         System.out.println(station);
         System.out.println(stationFacade.stationToStationDto(station));
     }

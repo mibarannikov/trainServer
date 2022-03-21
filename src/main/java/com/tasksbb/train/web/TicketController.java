@@ -47,7 +47,6 @@ public class TicketController {
 //        ResponseEntity<Object> errors = responseErrorValidation.mapValidationService(bindingResult);
 //        if (!ObjectUtils.isEmpty(errors)) return errors;
         User user = userService.getCurrentUser(principal);
-
         TicketDto boughtTicket = ticketService.buyTicket(ticket, user);
         return new ResponseEntity<>(boughtTicket, HttpStatus.OK);
     }

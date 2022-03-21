@@ -7,7 +7,7 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class StationFacade {
-    public StationDto stationToStationDto(StationEntity station) {
+    public static StationDto stationToStationDto(StationEntity station) {
         StationDto stationDto = new StationDto();
         stationDto.setId(station.getId());
         stationDto.setNameStation(station.getNameStation());

@@ -5,22 +5,19 @@ import com.tasksbb.train.entity.StationEntity;
 import com.tasksbb.train.ex.StationNotFoundException;
 import com.tasksbb.train.facade.StationFacade;
 import com.tasksbb.train.repository.StationEntityRepository;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.LinkedHashSet;
 import java.util.List;
 
+@RequiredArgsConstructor
 @Service
 public class StationService {
 
     public final StationFacade stationFacade;
     public final StationEntityRepository stationEntityRepository;
 
-    public StationService(StationFacade stationFacade,
-                          StationEntityRepository stationEntityRepository) {
-        this.stationFacade = stationFacade;
-        this.stationEntityRepository = stationEntityRepository;
-    }
 
     public StationEntity updateStation() {
         return null;
@@ -52,7 +49,7 @@ public class StationService {
     public StationDto findByNameStation(String name) {
         StationEntity station = stationEntityRepository.findByNameStation(name)
                 .orElseThrow(()-> new StationNotFoundException("Station with name "+name+" not found"));
-        return stationFacade.stationToStationDto(station);
+        return StationFacade.stationToStationDto(station);
 
     }
 }

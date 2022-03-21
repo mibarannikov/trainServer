@@ -6,6 +6,7 @@ import com.tasksbb.train.entity.*;
 import com.tasksbb.train.ex.ScheduleNotFoundException;
 import com.tasksbb.train.facade.TicketFacade;
 import com.tasksbb.train.repository.*;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -16,6 +17,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+@RequiredArgsConstructor
 @Service
 public class TicketService {
 
@@ -28,21 +30,6 @@ public class TicketService {
     private final PassengerEntityRepository passengerEntityRepository;
 
     private final PassengerService passengerService;
-
-    private final TrainEntityRepository trainEntityRepository;
-
-    public TicketService(SeatEntityRepository seatEntityRepository,
-                         TicketEntityRepository ticketEntityRepository,
-                         PointOfScheduleRepository pointOfScheduleRepository,
-                         PassengerEntityRepository passengerEntityRepository,
-                         PassengerService passengerService, TrainEntityRepository trainEntityRepository) {
-        this.seatEntityRepository = seatEntityRepository;
-        this.ticketEntityRepository = ticketEntityRepository;
-        this.pointOfScheduleRepository = pointOfScheduleRepository;
-        this.passengerEntityRepository = passengerEntityRepository;
-        this.passengerService = passengerService;
-        this.trainEntityRepository = trainEntityRepository;
-    }
 
     @Transactional
     public TicketDto buyTicket(TicketDto ticketDto, User user) {
@@ -59,9 +46,6 @@ public class TicketService {
                     .add(pointOfScheduleRepository.findByTrainEntityAndStationEntityNameStation(seat.getTrainEntity(), name.getNameStation())
                             .orElseThrow(()->new ScheduleNotFoundException("Not found point of schedule for train number"+seat.getTrainEntity().getTrainNumber()+" and station " +name.getNameStation())));// todo orElseThrow()
         }
-        //newTicket.getPointOfSchedules().remove(newTicket.getPointOfSchedules().size() - 1);//?
-
-
         Optional<PassengerEntity> passenger = passengerEntityRepository
                 .findByFirstnameAndLastnameAndDateOfBirth(
                         ticketDto.getFirstnamePassenger(),

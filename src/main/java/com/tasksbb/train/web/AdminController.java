@@ -50,7 +50,7 @@ public class AdminController {
     }
 
     @PostMapping("/station/add")
-    public ResponseEntity<StationDto> addStation(@Valid @RequestBody StationDto stationDto,
+    public ResponseEntity<StationDto> addStation( @RequestBody StationDto stationDto,
                                              BindingResult bindingResult) {
         responseErrorValidation.mapValidationService(bindingResult);
 //        if (!ObjectUtils.isEmpty(errors)) {

@@ -7,12 +7,11 @@ import com.tasksbb.train.entity.SeatEntity;
 import com.tasksbb.train.entity.TicketEntity;
 import com.tasksbb.train.entity.TrainEntity;
 import com.tasksbb.train.ex.ScheduleNotFoundException;
+import com.tasksbb.train.ex.StationNotFoundException;
 import com.tasksbb.train.ex.TrainNotFoundException;
-import com.tasksbb.train.facade.PointOfScheduleFacade;
 import com.tasksbb.train.facade.SeatFacade;
 import com.tasksbb.train.facade.TrainFacade;
 import com.tasksbb.train.repository.PointOfScheduleRepository;
-import com.tasksbb.train.repository.SeatEntityRepository;
 import com.tasksbb.train.repository.StationEntityRepository;
 import com.tasksbb.train.repository.TrainEntityRepository;
 import lombok.RequiredArgsConstructor;
@@ -30,11 +29,8 @@ import java.util.stream.Collectors;
 @Service
 public class TrainService {
     public static final Logger LOG = LoggerFactory.getLogger(TrainService.class);
+
     private final TrainEntityRepository trainEntityRepository;
-
-    private final SeatEntityRepository seatEntityRepository;
-
-    private final PointOfScheduleFacade pointOfScheduleFacade;
 
     private final StationEntityRepository stationEntityRepository;
 
@@ -58,10 +54,13 @@ public class TrainService {
             PointOfScheduleEntity p = new PointOfScheduleEntity();
             p.setArrivalTime(trainDto.getPointsOfSchedule().get(i).getArrivalTime());
             p.setDepartureTime(trainDto.getPointsOfSchedule().get(i).getDepartureTime());
-            p.setStationEntity(stationEntityRepository.findByNameStation(trainDto.getPointsOfSchedule().get(i).getNameStation()));
+            p.setStationEntity(stationEntityRepository.findByNameStation(trainDto.getPointsOfSchedule().get(i).getNameStation())
+                    .orElseThrow(()-> new StationNotFoundException("Station not found")));
+            LOG.info("Station name"+ trainDto.getPointsOfSchedule().get(i).getNameStation());
             p.setTrainEntity(addTrain);
             addTrain.getPointOfSchedules().add(p);
         }
+
         return trainEntityRepository.save(addTrain);
     }
 
