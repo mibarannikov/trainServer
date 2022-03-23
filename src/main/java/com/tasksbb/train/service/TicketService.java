@@ -5,7 +5,10 @@ import com.tasksbb.train.dto.TicketDto;
 import com.tasksbb.train.entity.*;
 import com.tasksbb.train.ex.ScheduleNotFoundException;
 import com.tasksbb.train.facade.TicketFacade;
-import com.tasksbb.train.repository.*;
+import com.tasksbb.train.repository.PassengerEntityRepository;
+import com.tasksbb.train.repository.PointOfScheduleRepository;
+import com.tasksbb.train.repository.SeatEntityRepository;
+import com.tasksbb.train.repository.TicketEntityRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -34,7 +37,7 @@ public class TicketService {
     @Transactional
     public TicketDto buyTicket(TicketDto ticketDto, User user) {
         if (!timeValidationTicket(ticketDto)) {
-            ticketDto.getNameStations().get(0).setNameStation("station whose name is oblivion");//exception
+            ticketDto.getNameStations().get(0).setNameStation("station whose name is oblivion");//todo throw exception
             return ticketDto;
         }
         TicketEntity newTicket = new TicketEntity();
@@ -44,7 +47,7 @@ public class TicketService {
         for (PointOfScheduleDto name : ticketDto.getNameStations()) {
             newTicket.getPointOfSchedules()
                     .add(pointOfScheduleRepository.findByTrainEntityAndStationEntityNameStation(seat.getTrainEntity(), name.getNameStation())
-                            .orElseThrow(()->new ScheduleNotFoundException("Not found point of schedule for train number"+seat.getTrainEntity().getTrainNumber()+" and station " +name.getNameStation())));// todo orElseThrow()
+                            .orElseThrow(() -> new ScheduleNotFoundException("Not found point of schedule for train number" + seat.getTrainEntity().getTrainNumber() + " and station " + name.getNameStation())));// todo orElseThrow()
         }
         Optional<PassengerEntity> passenger = passengerEntityRepository
                 .findByFirstnameAndLastnameAndDateOfBirth(
@@ -59,13 +62,11 @@ public class TicketService {
             newTicket.setPassengerEntity(pass);
         } else {
             if (passengerService.passengerIsPresent(seat.getTrainEntity(), passenger.get(), newTicket.getPointOfSchedules())) {
-                ticketDto.setId(0L);// throw
+                ticketDto.setId(0L);//todo throw exception
                 return ticketDto;
             }
             newTicket.setPassengerEntity(passenger.get());
         }
-
-
         newTicket.setUser(user);
         newTicket.setSeatEntity(seat);
         newTicket = ticketEntityRepository.save(newTicket);

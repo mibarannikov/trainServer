@@ -5,7 +5,7 @@ import com.tasksbb.train.entity.StationEntity;
 import org.springframework.stereotype.Component;
 
 
-@Component
+
 public class StationFacade {
     public static StationDto stationToStationDto(StationEntity station) {
         StationDto stationDto = new StationDto();

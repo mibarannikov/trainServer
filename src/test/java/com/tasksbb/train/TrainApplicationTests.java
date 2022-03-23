@@ -22,7 +22,7 @@ class TrainApplicationTests {
 
     public final StationEntityRepository stationEntityRepository;
 
-    public final  StationFacade stationFacade;
+
 
     public final  TrainEntityRepository trainEntityRepository;
 
@@ -30,7 +30,7 @@ class TrainApplicationTests {
 
     public TrainApplicationTests(StationEntityRepository stationEntityRepository, StationFacade stationFacade, TrainEntityRepository trainEntityRepository, PointOfScheduleRepository pointOfScheduleRepository) {
         this.stationEntityRepository = stationEntityRepository;
-        this.stationFacade = stationFacade;
+
         this.trainEntityRepository = trainEntityRepository;
         this.pointOfScheduleRepository = pointOfScheduleRepository;
     }
@@ -68,7 +68,7 @@ class TrainApplicationTests {
     void test3() {
          StationEntity station = stationEntityRepository.findByNameStation("b").get();
         System.out.println(station);
-        System.out.println(stationFacade.stationToStationDto(station));
+        System.out.println(StationFacade.stationToStationDto(station));
     }
 
     @Test

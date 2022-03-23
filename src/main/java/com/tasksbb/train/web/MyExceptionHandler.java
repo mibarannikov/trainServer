@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 
 import java.util.Map;
 
-@ControllerAdvice
+//@ControllerAdvice
 public class MyExceptionHandler {
 
     @ExceptionHandler(ValidationException.class)

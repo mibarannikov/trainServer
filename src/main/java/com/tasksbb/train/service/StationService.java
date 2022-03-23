@@ -2,10 +2,13 @@ package com.tasksbb.train.service;
 
 import com.tasksbb.train.dto.StationDto;
 import com.tasksbb.train.entity.StationEntity;
+import com.tasksbb.train.ex.StationExistException;
 import com.tasksbb.train.ex.StationNotFoundException;
 import com.tasksbb.train.facade.StationFacade;
 import com.tasksbb.train.repository.StationEntityRepository;
 import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.util.LinkedHashSet;
@@ -14,8 +17,8 @@ import java.util.List;
 @RequiredArgsConstructor
 @Service
 public class StationService {
+    public static final Logger LOG = LoggerFactory.getLogger(StationService.class);
 
-    public final StationFacade stationFacade;
     public final StationEntityRepository stationEntityRepository;
 
 
@@ -29,6 +32,7 @@ public class StationService {
     }
 
     public StationEntity addStation(StationDto stationDto) {
+
         StationEntity station = new StationEntity();
         station.setNameStation(stationDto.getNameStation());
         station.setLatitude(stationDto.getLatitude());
@@ -39,11 +43,20 @@ public class StationService {
                         .orElseThrow(()-> new StationNotFoundException("Station with name "+s+" not found")));
             }
             station.getCanGetStations().forEach(st -> st.getCanGetStations().add(station));
-            return stationEntityRepository.save(station);
+            try {
+                return stationEntityRepository.save(station);
+            }catch (Exception ex){
+                throw new StationExistException("station with name "+stationDto.getNameStation()+ "already exist");
+            }
+
         }
         station.setCanGetStations(new LinkedHashSet<>());
-        return stationEntityRepository.save(station);
 
+        try {
+            return stationEntityRepository.save(station);
+        } catch (Exception ex){
+            throw new StationExistException("station with name "+stationDto.getNameStation()+ "already exist");
+        }
     }
 
     public StationDto findByNameStation(String name) {

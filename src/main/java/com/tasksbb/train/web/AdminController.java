@@ -11,6 +11,7 @@ import com.tasksbb.train.service.StationService;
 import com.tasksbb.train.service.TicketService;
 import com.tasksbb.train.service.TrainService;
 import com.tasksbb.train.validations.ResponseErrorValidation;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
@@ -25,6 +26,7 @@ import org.springframework.web.bind.annotation.RestController;
 import javax.validation.Valid;
 import java.util.List;
 
+@RequiredArgsConstructor
 @RestController
 @RequestMapping("api/admin")
 @CrossOrigin
@@ -35,19 +37,11 @@ public class AdminController {
 
     public final ResponseErrorValidation responseErrorValidation;
 
-    public final StationFacade stationFacade;
 
     public final TrainService trainService;
 
     public final TicketService ticketService;
 
-    public AdminController(StationService stationService, ResponseErrorValidation responseErrorValidation, StationFacade stationFacade, TrainService trainService, TicketService ticketService) {
-        this.stationService = stationService;
-        this.responseErrorValidation = responseErrorValidation;
-        this.stationFacade = stationFacade;
-        this.trainService = trainService;
-        this.ticketService = ticketService;
-    }
 
     @PostMapping("/station/add")
     public ResponseEntity<StationDto> addStation( @RequestBody StationDto stationDto,
@@ -57,11 +51,11 @@ public class AdminController {
 //            return errors;
 //        }
         StationEntity station = stationService.addStation(stationDto);
-        return new ResponseEntity<>(stationFacade.stationToStationDto(station), HttpStatus.OK);
+        return new ResponseEntity<>(StationFacade.stationToStationDto(station), HttpStatus.OK);
     }
 
     @PostMapping("/train/add")
-    public ResponseEntity<TrainDto> addTrain(@Valid @RequestBody TrainDto trainDto,
+    public ResponseEntity<TrainDto> addTrain( @RequestBody TrainDto trainDto,
                                            BindingResult bindingResult) {
         responseErrorValidation.mapValidationService(bindingResult);
 //        ResponseEntity<Object> errors =

@@ -20,6 +20,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -36,13 +37,19 @@ public class TrainService {
 
     private final PointOfScheduleRepository pointOfScheduleRepository;
 
+
     @Transactional
     public TrainEntity addTrain(TrainDto trainDto) {
         TrainEntity addTrain = new TrainEntity();
         addTrain.setTrainNumber(trainDto.getTrainNumber());
         addTrain.setTrainSpeed(trainDto.getTrainSpeed());
         addTrain.setDepartureTime(trainDto.getDepartureTime());
-        addTrain = trainEntityRepository.save(addTrain);
+        addTrain.setArrivalTimeEnd(trainDto.getArrivalTimeEnd());
+        try {
+            addTrain = trainEntityRepository.save(addTrain);
+        } catch (Exception ex){
+            throw new TrainNotFoundException("train number "+trainDto.getTrainNumber().toString()+" already exists");
+        }
         for (int i = 1; i <= trainDto.getSumSeats(); i++) {
             SeatEntity s = new SeatEntity();
             s.setSeatNumber((long) i);

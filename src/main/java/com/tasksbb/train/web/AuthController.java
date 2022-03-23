@@ -8,6 +8,7 @@ import com.tasksbb.train.security.JwtTokenProvider;
 import com.tasksbb.train.security.SecurityConstans;
 import com.tasksbb.train.service.UserService;
 import com.tasksbb.train.validations.ResponseErrorValidation;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -24,9 +25,8 @@ import javax.validation.Valid;
 @RestController
 @RequestMapping("/api/auth")
 @PreAuthorize("permitAll()")
+@RequiredArgsConstructor
 public class AuthController {
-
-
 
     private final JwtTokenProvider jwtTokenProvider;
 
@@ -35,16 +35,6 @@ public class AuthController {
     private final ResponseErrorValidation responseErrorValidation;
 
     private final UserService userService;
-
-    public AuthController(JwtTokenProvider jwtTokenProvider,
-                          AuthenticationManager authenticationManager,
-                          ResponseErrorValidation responseErrorValidation,
-                          UserService userService) {
-        this.jwtTokenProvider = jwtTokenProvider;
-        this.authenticationManager = authenticationManager;
-        this.responseErrorValidation = responseErrorValidation;
-        this.userService = userService;
-    }
 
     @PostMapping("/signin")
     public ResponseEntity<Object> authenticateUser(@Valid @RequestBody LoginRequest loginRequest, BindingResult bindingResult) {
