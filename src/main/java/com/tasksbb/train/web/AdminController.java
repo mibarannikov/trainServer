@@ -15,13 +15,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.util.List;
@@ -53,6 +47,18 @@ public class AdminController {
         StationEntity station = stationService.addStation(stationDto);
         return new ResponseEntity<>(StationFacade.stationToStationDto(station), HttpStatus.OK);
     }
+
+    @PutMapping("/station/edit")
+    public ResponseEntity<StationDto> editStation( @RequestBody StationDto stationDto,
+                                                  BindingResult bindingResult) {
+        responseErrorValidation.mapValidationService(bindingResult);
+//        if (!ObjectUtils.isEmpty(errors)) {
+//            return errors;
+//        }
+        StationDto station = stationService.editStation(stationDto);
+        return new ResponseEntity<>(station, HttpStatus.OK);
+    }
+
 
     @PostMapping("/train/add")
     public ResponseEntity<TrainDto> addTrain( @RequestBody TrainDto trainDto,
