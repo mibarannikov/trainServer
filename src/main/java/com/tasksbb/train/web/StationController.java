@@ -32,6 +32,12 @@ public class StationController {
         return new ResponseEntity<>(stationsDto, HttpStatus.OK);
     }
 
+    @GetMapping("/search")
+    public ResponseEntity<List<StationDto>> getAllSearchStations(@RequestParam(name= "value") String value) {
+        List<StationDto> stationsDto = stationService.findAllSearchStation(value);
+        return new ResponseEntity<>(stationsDto, HttpStatus.OK);
+    }
+
     @GetMapping("/get")
     public ResponseEntity<StationDto> getStationByName(@RequestParam String name) {
         StationDto stationDto = stationService.findByNameStation(name);

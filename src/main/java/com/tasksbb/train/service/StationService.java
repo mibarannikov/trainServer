@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 @Service
@@ -63,6 +64,20 @@ public class StationService {
         StationEntity station = stationEntityRepository.findByNameStation(name)
                 .orElseThrow(()-> new StationNotFoundException("Station with name "+name+" not found"));
         return StationFacade.stationToStationDto(station);
+
+    }
+
+    public List<StationDto> findAllSearchStation(String value) {
+
+        return stationEntityRepository.findByNameStationStartsWithOrderByNameStationAsc(value)
+                .stream()
+                .map(StationFacade::stationToStationDto)
+                .collect(Collectors.toList());
+    }
+
+
+    public StationDto editStation(StationDto stationDto) {
+        return new StationDto();
 
     }
 }
