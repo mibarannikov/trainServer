@@ -11,17 +11,17 @@ import java.util.List;
 @Getter
 @Setter
 public class TicketDto {
-    public Long id;
+    private Long id;
     @NotEmpty
-    public Long seatNumber;
+    private Long seatNumber;
     @NotEmpty
-    public String firstnamePassenger;
+    private String firstnamePassenger;
     @NotEmpty
-    public String lastnamePassenger;
+    private String lastnamePassenger;
     @NotEmpty
-    public LocalDate dateOfBirth;
+    private LocalDate dateOfBirth;
     @NotEmpty
-    public Long numberTrainOwner;
+    private Long numberTrainOwner;
     @NotEmpty
-    public List<PointOfScheduleDto> nameStations = new ArrayList<>();
+    private List<PointOfScheduleDto> nameStations = new ArrayList<>();
 }

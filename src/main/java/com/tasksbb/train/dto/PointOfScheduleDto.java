@@ -16,6 +16,12 @@ public class PointOfScheduleDto {
     private String nameStation;
     @NotEmpty
     private LocalDateTime arrivalTime;
+
+    private LocalDateTime arrivalTimeInit;
     @NotEmpty
     private LocalDateTime departureTime;
+
+    private LocalDateTime departureTimeInit;
+
+    private int delayed;
 }

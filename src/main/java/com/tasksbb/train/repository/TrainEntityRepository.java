@@ -16,6 +16,8 @@ public interface TrainEntityRepository extends JpaRepository<TrainEntity, Long> 
 
     List<TrainEntity> findByArrivalTimeEndAfter(LocalDateTime arrivalTimeEnd);
 
+    List<TrainEntity> findByPointOfSchedules_StationEntity_Id(Long id);
+
 
 
 

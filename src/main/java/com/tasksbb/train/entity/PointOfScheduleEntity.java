@@ -11,7 +11,7 @@ import java.time.LocalDateTime;
 @Table(name = "point_of_schedule_entity")
 @Getter
 @Setter
-public class PointOfScheduleEntity extends DateCreateUpdate{
+public class PointOfScheduleEntity  extends DateCreateUpdate{
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false)
@@ -26,11 +26,33 @@ public class PointOfScheduleEntity extends DateCreateUpdate{
     private LocalDateTime arrivalTime;
 
     @JsonFormat(pattern = "dd-mm-yyyy HH:mm")
+    @Column(name = "arrival_time_init")
+    private LocalDateTime arrivalTimeInit;
+
+    @JsonFormat(pattern = "dd-mm-yyyy HH:mm")
     @Column(name = "departure_time")
     private LocalDateTime departureTime;
 
-    @ManyToOne(cascade = CascadeType.ALL, optional = false,fetch = FetchType.EAGER)
+    @Column(name = "departure_time_init")
+    private LocalDateTime departureTimeInit;
+
+    @Column(name = "delay",nullable = false)
+    private Integer delayed;
+
+    @ManyToOne(cascade = CascadeType.ALL, optional = false, fetch = FetchType.EAGER)
     @JoinColumn(name = "train_entity_id", nullable = false)
     private TrainEntity trainEntity;
+
+
+    @Override
+    protected void onCreate() {
+        super.onCreate();
+        this.arrivalTimeInit = this.arrivalTime;
+        this.departureTimeInit = this.departureTime;
+        this.delayed=0;
+    }
+
+
+
 
 }
