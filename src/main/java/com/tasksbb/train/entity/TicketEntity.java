@@ -1,9 +1,11 @@
 package com.tasksbb.train.entity;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Getter;
 import lombok.Setter;
 
 import javax.persistence.*;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -11,7 +13,7 @@ import java.util.List;
 @Table(name = "ticket_entity")
 @Getter
 @Setter
-public class TicketEntity {
+public class TicketEntity extends DateCreateUpdate {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false)
@@ -36,7 +38,5 @@ public class TicketEntity {
     @JoinColumn(name = "user_id")
     private User user;
 
-    @Version
-    private Long version;
 
 }

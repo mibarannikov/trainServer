@@ -1,6 +1,7 @@
 package com.tasksbb.train.security;
 
 import com.tasksbb.train.entity.User;
+import com.tasksbb.train.ex.MyExpiredJwtException;
 import io.jsonwebtoken.*;
 import lombok.Data;
 import org.slf4j.Logger;
@@ -47,7 +48,8 @@ public class JwtTokenProvider {
                 UnsupportedJwtException |
                 IllegalArgumentException ex) {
             LOG.error(ex.getMessage());
-            return false;
+            throw new MyExpiredJwtException("JWT expired");
+            //return false;
         }
     }
 

@@ -7,14 +7,10 @@ import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
 
-@Component
+
 public class PointOfScheduleFacade {
 
-//    public final StationEntityRepository stationEntityRepository;
 
-    public PointOfScheduleFacade() {
-//        this.stationEntityRepository = stationEntityRepository;
-    }
 
 //    public PointOfScheduleEntity dtoToPointOfScheduleEntity(LocalDateTime time, String nameStation) {
 //
@@ -29,6 +25,7 @@ public class PointOfScheduleFacade {
         pointDto.setId(point.getId());
         pointDto.setNameStation(point.getStationEntity().getNameStation());
         pointDto.setArrivalTime(point.getArrivalTime());
+        pointDto.setDepartureTime(point.getDepartureTime());
         return pointDto;
     }
 }

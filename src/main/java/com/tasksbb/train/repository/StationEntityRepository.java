@@ -8,6 +8,14 @@ import java.util.Optional;
 
 public interface StationEntityRepository extends JpaRepository<StationEntity, Long> {
 
-StationEntity findByNameStation(String nameStation);
-Optional<List<StationEntity>> findByNameStationContaining(String name);
+    Optional<StationEntity> findByNameStation(String nameStation);
+
+    List<StationEntity> findByNameStationStartsWith(String nameStation);
+
+    List<StationEntity> findByNameStationStartsWithOrderByNameStationAsc(String nameStation);
+
+
+
+    List<StationEntity> findByOrderByNameStationAsc();
+
 }

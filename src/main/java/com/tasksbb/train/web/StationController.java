@@ -6,6 +6,7 @@ import com.tasksbb.train.dto.TrainDto;
 import com.tasksbb.train.facade.StationFacade;
 import com.tasksbb.train.service.StationService;
 import com.tasksbb.train.service.TrainService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -14,6 +15,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.stream.Collectors;
 
+@RequiredArgsConstructor
 @RestController
 @RequestMapping("api/station")
 @CrossOrigin
@@ -21,21 +23,18 @@ import java.util.stream.Collectors;
 public class StationController {
 
     public final StationService stationService;
-    public final StationFacade stationFacade;
     public final TrainService trainService;
-
-    public StationController(StationService stationService,
-                             StationFacade stationFacade,
-                             TrainService trainService) {
-        this.stationService = stationService;
-        this.stationFacade = stationFacade;
-        this.trainService = trainService;
-    }
 
     @GetMapping("/all")
     public ResponseEntity<List<StationDto>> getAllStations() {
         List<StationDto> stationsDto = stationService.findAllStation()
-                .stream().map(stationFacade::stationToStationDto).collect(Collectors.toList());
+                .stream().map(StationFacade::stationToStationDto).collect(Collectors.toList());
+        return new ResponseEntity<>(stationsDto, HttpStatus.OK);
+    }
+
+    @GetMapping("/search")
+    public ResponseEntity<List<StationDto>> getAllSearchStations(@RequestParam(name= "value") String value) {
+        List<StationDto> stationsDto = stationService.findAllSearchStation(value);
         return new ResponseEntity<>(stationsDto, HttpStatus.OK);
     }
 

@@ -2,23 +2,26 @@ package com.tasksbb.train.service;
 
 import com.tasksbb.train.dto.StationDto;
 import com.tasksbb.train.entity.StationEntity;
+import com.tasksbb.train.ex.StationExistException;
+import com.tasksbb.train.ex.StationNotFoundException;
 import com.tasksbb.train.facade.StationFacade;
 import com.tasksbb.train.repository.StationEntityRepository;
+import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.stream.Collectors;
 
+@RequiredArgsConstructor
 @Service
 public class StationService {
+    public static final Logger LOG = LoggerFactory.getLogger(StationService.class);
 
-    public final StationFacade stationFacade;
     public final StationEntityRepository stationEntityRepository;
 
-    public StationService(StationFacade stationFacade, StationEntityRepository stationEntityRepository) {
-        this.stationFacade = stationFacade;
-        this.stationEntityRepository = stationEntityRepository;
-    }
 
     public StationEntity updateStation() {
         return null;
@@ -26,32 +29,55 @@ public class StationService {
 
     public List<StationEntity> findAllStation() {
 
-        return stationEntityRepository.findAll();
+        return stationEntityRepository.findByOrderByNameStationAsc();
     }
 
     public StationEntity addStation(StationDto stationDto) {
+
         StationEntity station = new StationEntity();
         station.setNameStation(stationDto.getNameStation());
         station.setLatitude(stationDto.getLatitude());
         station.setLongitude(stationDto.getLongitude());
         if ((stationDto.getCanGetStation().size() != 0) && (stationDto.getCanGetStation() != null)) {
             for (String s : stationDto.getCanGetStation()) {
-                station.getCanGetStations().add(stationEntityRepository.findByNameStation(s));
+                station.getCanGetStations().add(stationEntityRepository.findByNameStation(s)
+                        .orElseThrow(()-> new StationNotFoundException("Station with name "+s+" not found")));
             }
             station.getCanGetStations().forEach(st -> st.getCanGetStations().add(station));
-            //  .stream()
-            //  .map(st -> st.getCanGetStations().add(station))
-            //  .collect(Collectors.toSet());
-            return stationEntityRepository.save(station);
+            try {
+                return stationEntityRepository.save(station);
+            }catch (Exception ex){
+                throw new StationExistException("station with name "+stationDto.getNameStation()+ "already exist");
+            }
+
         }
         station.setCanGetStations(new LinkedHashSet<>());
-        return stationEntityRepository.save(station);
 
+        try {
+            return stationEntityRepository.save(station);
+        } catch (Exception ex){
+            throw new StationExistException("station with name "+stationDto.getNameStation()+ "already exist");
+        }
     }
 
     public StationDto findByNameStation(String name) {
-        StationEntity station = stationEntityRepository.findByNameStation(name);
-        return stationFacade.stationToStationDto(station);
+        StationEntity station = stationEntityRepository.findByNameStation(name)
+                .orElseThrow(()-> new StationNotFoundException("Station with name "+name+" not found"));
+        return StationFacade.stationToStationDto(station);
+
+    }
+
+    public List<StationDto> findAllSearchStation(String value) {
+
+        return stationEntityRepository.findByNameStationStartsWithOrderByNameStationAsc(value)
+                .stream()
+                .map(StationFacade::stationToStationDto)
+                .collect(Collectors.toList());
+    }
+
+
+    public StationDto editStation(StationDto stationDto) {
+        return new StationDto();
 
     }
 }

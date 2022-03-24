@@ -1,6 +1,6 @@
 package com.tasksbb.train.service;
 
-import com.tasksbb.train.dto.UserDTO;
+
 import com.tasksbb.train.entity.User;
 import com.tasksbb.train.entity.enums.ERole;
 import com.tasksbb.train.ex.UserExistException;
@@ -8,7 +8,6 @@ import com.tasksbb.train.payload.request.SignupRequest;
 import com.tasksbb.train.repository.UserRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -22,7 +21,7 @@ public class UserService {
     private final UserRepository userRepository;
     private final BCryptPasswordEncoder passwordEncoder;
 
-    @Autowired
+
     public UserService(UserRepository userRepository, BCryptPasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
@@ -36,7 +35,7 @@ public class UserService {
         user.setLastname(userIn.getLastname());
         user.setUsername(userIn.getUsername());
         user.setPassword(passwordEncoder.encode(userIn.getPassword()));
-        user.getRole().add(ERole.ROLE_ADMIN);
+        user.getRole().add(ERole.ROLE_USER);
 
         try {
             LOG.info("Saving User {}", userIn.getEmail());
@@ -47,14 +46,14 @@ public class UserService {
         }
     }
 
-    public User updateUser(UserDTO userDTO, Principal principal) {
-        User user = getUserByPrincipal(principal);
-        user.setName(userDTO.getFirstname());
-        user.setLastname(userDTO.getLastname());
-        user.setBio(userDTO.getBio());
-
-        return userRepository.save(user);
-    }
+//    public User updateUser(UserDTO userDTO, Principal principal) {
+//        User user = getUserByPrincipal(principal);
+//        user.setName(userDTO.getFirstname());
+//        user.setLastname(userDTO.getLastname());
+//        user.setBio(userDTO.getBio());
+//
+//        return userRepository.save(user);
+//    }
 
     public User getCurrentUser(Principal principal) {
         return getUserByPrincipal(principal);
@@ -67,7 +66,7 @@ public class UserService {
 
     }
 
-    public User getUserById(Long id) {
-        return userRepository.findById(id).orElseThrow(() -> new UsernameNotFoundException("User not found"));
-    }
+//    public User getUserById(Long id) {
+//        return userRepository.findById(id).orElseThrow(() -> new UsernameNotFoundException("User not found"));
+//    }
 }

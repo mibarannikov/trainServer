@@ -3,8 +3,13 @@ package com.tasksbb.train.service;
 import com.tasksbb.train.dto.PointOfScheduleDto;
 import com.tasksbb.train.dto.TicketDto;
 import com.tasksbb.train.entity.*;
+import com.tasksbb.train.ex.ScheduleNotFoundException;
 import com.tasksbb.train.facade.TicketFacade;
-import com.tasksbb.train.repository.*;
+import com.tasksbb.train.repository.PassengerEntityRepository;
+import com.tasksbb.train.repository.PointOfScheduleRepository;
+import com.tasksbb.train.repository.SeatEntityRepository;
+import com.tasksbb.train.repository.TicketEntityRepository;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -15,6 +20,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+@RequiredArgsConstructor
 @Service
 public class TicketService {
 
@@ -28,30 +34,21 @@ public class TicketService {
 
     private final PassengerService passengerService;
 
-    private final TrainEntityRepository trainEntityRepository;
-
-    public TicketService(SeatEntityRepository seatEntityRepository,
-                         TicketEntityRepository ticketEntityRepository,
-                         PointOfScheduleRepository pointOfScheduleRepository,
-                         PassengerEntityRepository passengerEntityRepository,
-                         PassengerService passengerService, TrainEntityRepository trainEntityRepository) {
-        this.seatEntityRepository = seatEntityRepository;
-        this.ticketEntityRepository = ticketEntityRepository;
-        this.pointOfScheduleRepository = pointOfScheduleRepository;
-        this.passengerEntityRepository = passengerEntityRepository;
-        this.passengerService = passengerService;
-        this.trainEntityRepository = trainEntityRepository;
-    }
-
     @Transactional
     public TicketDto buyTicket(TicketDto ticketDto, User user) {
         if (!timeValidationTicket(ticketDto)) {
-            ticketDto.getNameStations().get(0).setNameStation("station whose name is oblivion");
+            ticketDto.getNameStations().get(0).setNameStation("station whose name is oblivion");//todo throw exception
             return ticketDto;
         }
         TicketEntity newTicket = new TicketEntity();
         SeatEntity seat = seatEntityRepository
                 .findByTrainEntityTrainNumberAndSeatNumber(ticketDto.getNumberTrainOwner(), ticketDto.getSeatNumber());// todo orElseThrow()
+
+        for (PointOfScheduleDto name : ticketDto.getNameStations()) {
+            newTicket.getPointOfSchedules()
+                    .add(pointOfScheduleRepository.findByTrainEntityAndStationEntityNameStation(seat.getTrainEntity(), name.getNameStation())
+                            .orElseThrow(() -> new ScheduleNotFoundException("Not found point of schedule for train number" + seat.getTrainEntity().getTrainNumber() + " and station " + name.getNameStation())));// todo orElseThrow()
+        }
         Optional<PassengerEntity> passenger = passengerEntityRepository
                 .findByFirstnameAndLastnameAndDateOfBirth(
                         ticketDto.getFirstnamePassenger(),
@@ -64,19 +61,14 @@ public class TicketService {
             pass.setDateOfBirth(ticketDto.getDateOfBirth());
             newTicket.setPassengerEntity(pass);
         } else {
-            if (passengerService.passengerIsPresent(seat.getTrainEntity(), passenger.get())) {
-                ticketDto.setId(0L);
+            if (passengerService.passengerIsPresent(seat.getTrainEntity(), passenger.get(), newTicket.getPointOfSchedules())) {
+                ticketDto.setId(0L);//todo throw exception
                 return ticketDto;
             }
             newTicket.setPassengerEntity(passenger.get());
         }
         newTicket.setUser(user);
         newTicket.setSeatEntity(seat);
-        for (PointOfScheduleDto name : ticketDto.getNameStations()) {
-            newTicket.getPointOfSchedules()
-                    .add(pointOfScheduleRepository.findByTrainEntityAndStationEntityNameStation(seat.getTrainEntity(), name.getNameStation()));// todo orElseThrow()
-        }
-        newTicket.getPointOfSchedules().remove(newTicket.getPointOfSchedules().size() - 1);
         newTicket = ticketEntityRepository.save(newTicket);
         return TicketFacade.ticketToTicketDto(newTicket);
     }
@@ -95,20 +87,24 @@ public class TicketService {
     }
 
     private boolean timeValidationTicket(TicketDto ticketDto) {
-        return ticketDto.getNameStations().get(0).getArrivalTime().isAfter(LocalDateTime.now().plusMinutes(10));// todo null
+        return ticketDto.getNameStations().get(0).getDepartureTime().isAfter(LocalDateTime.now().plusMinutes(10));
+    }
+
+    public List<TicketDto> AllTrainTickets(Long trainNumber) {
+        List<TicketEntity> tickets = ticketEntityRepository.findBySeatEntity_TrainEntity_TrainNumber(trainNumber);
+        return tickets.stream().map(TicketFacade::ticketToTicketDto).collect(Collectors.toList());
     }
 
     @Transactional
     public List<TicketDto> ticketsOnTheTrainNow(Long trainNumber) {
-        //TrainEntity train = trainEntityRepository.findByTrainNumber(trainNumber).get(); //  todo orElseThrow()
         List<PointOfScheduleEntity> points = pointOfScheduleRepository
-                .findByTrainEntityTrainNumberAndArrivalTimeBeforeOrderByArrivalTimeAsc(trainNumber, LocalDateTime.now());
-            if(points.isEmpty()){
-                return new ArrayList<TicketDto>();
-            }
-        //.findByTrainEntityAndArrivalTimeBeforeOrderByArrivalTimeAsc(train, LocalDateTime.now());
+                .findByTrainEntityTrainNumberAndDepartureTimeBeforeOrderByArrivalTimeAsc(trainNumber, LocalDateTime.now());
+        if (points.isEmpty()) {
+            return new ArrayList<TicketDto>();// todo exception
+        }
         List<TicketEntity> tickets = ticketEntityRepository
                 .findAllByPointOfSchedules(points.get(points.size() - 1));
+        // tickets =tickets.stream().filter(t -> t.getPointOfSchedules().get(t.getPointOfSchedules().size()-1)!=points.get(points.size()-1)).collect(Collectors.toList());
 
         //List<SeatEntity> seats = seatEntityRepository.findByTrainEntity(train);
         //for (SeatEntity st : seats) {
@@ -119,6 +115,7 @@ public class TicketService {
         //    }
         //}
         return tickets.stream()
+                .filter(t -> t.getPointOfSchedules().get(t.getPointOfSchedules().size() - 1) != points.get(points.size() - 1))
                 .map(TicketFacade::ticketToTicketDto)
                 .collect(Collectors.toList());
     }

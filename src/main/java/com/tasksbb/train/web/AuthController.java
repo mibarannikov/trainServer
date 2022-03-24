@@ -8,6 +8,7 @@ import com.tasksbb.train.security.JwtTokenProvider;
 import com.tasksbb.train.security.SecurityConstans;
 import com.tasksbb.train.service.UserService;
 import com.tasksbb.train.validations.ResponseErrorValidation;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -24,9 +25,8 @@ import javax.validation.Valid;
 @RestController
 @RequestMapping("/api/auth")
 @PreAuthorize("permitAll()")
+@RequiredArgsConstructor
 public class AuthController {
-
-
 
     private final JwtTokenProvider jwtTokenProvider;
 
@@ -36,20 +36,11 @@ public class AuthController {
 
     private final UserService userService;
 
-    public AuthController(JwtTokenProvider jwtTokenProvider,
-                          AuthenticationManager authenticationManager,
-                          ResponseErrorValidation responseErrorValidation,
-                          UserService userService) {
-        this.jwtTokenProvider = jwtTokenProvider;
-        this.authenticationManager = authenticationManager;
-        this.responseErrorValidation = responseErrorValidation;
-        this.userService = userService;
-    }
-
     @PostMapping("/signin")
     public ResponseEntity<Object> authenticateUser(@Valid @RequestBody LoginRequest loginRequest, BindingResult bindingResult) {
-        ResponseEntity<Object> errors = responseErrorValidation.mapValidationService(bindingResult);
-        if (!ObjectUtils.isEmpty(errors)) return errors;
+        responseErrorValidation.mapValidationService(bindingResult);
+//        ResponseEntity<Object> errors = responseErrorValidation.mapValidationService(bindingResult);
+//        if (!ObjectUtils.isEmpty(errors)) return errors;
 
         Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(
                 loginRequest.getUsername(),
@@ -64,9 +55,10 @@ public class AuthController {
 
 
     @PostMapping("/signup")
-    public ResponseEntity<Object> registerUser(@Valid @RequestBody SignupRequest signupRequest, BindingResult bindingResult) {
-        ResponseEntity<Object> errors = responseErrorValidation.mapValidationService(bindingResult);
-        if (!ObjectUtils.isEmpty(errors)) return errors;
+    public ResponseEntity<MessageResponse> registerUser(@Valid @RequestBody SignupRequest signupRequest, BindingResult bindingResult) {
+        responseErrorValidation.mapValidationService(bindingResult);
+//        ResponseEntity<Object> errors = responseErrorValidation.mapValidationService(bindingResult);
+//        if (!ObjectUtils.isEmpty(errors)) return errors;
 
         userService.createUser(signupRequest);
         return ResponseEntity.ok(new MessageResponse("User registered successfully!"));
