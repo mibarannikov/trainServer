@@ -39,6 +39,9 @@ public class TrainEntity extends DateCreateUpdate {
     @OneToMany(mappedBy = "trainEntity", orphanRemoval = true, cascade = CascadeType.ALL)
     private List<SeatEntity> seatEntities = new ArrayList<>();
 
+    @OneToMany(mappedBy = "trainEntity", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<WagonEntity> wagonEntities = new ArrayList<>();
+
     @Transient
     private Long amountOfEmptySeats;
 

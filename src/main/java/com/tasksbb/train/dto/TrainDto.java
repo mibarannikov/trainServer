@@ -25,5 +25,7 @@ public class TrainDto {
     private Long amountOfEmptySeats;
     @NotEmpty
     private List<PointOfScheduleDto> pointsOfSchedule = new ArrayList<>();
+    @NotEmpty
+    private  List<WagonDto> wagons = new ArrayList<>();
 }
 

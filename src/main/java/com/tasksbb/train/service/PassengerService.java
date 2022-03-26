@@ -21,7 +21,7 @@ public class PassengerService {
     public final SeatEntityRepository seatEntityRepository;
 
     public Boolean passengerIsPresent(TrainEntity train, PassengerEntity passenger, List<PointOfScheduleEntity> points) {
-        List<SeatEntity> seats = seatEntityRepository.findByTrainEntity(train);
+        List<SeatEntity> seats = seatEntityRepository.findByTrainEntity(train);// todo заменить на билеты поезда и избавиться от одно фора
 //        long countTickets = ticketEntityRepository
 //                .countByPassengerEntityAndPointOfSchedules_DepartureTimeAfterAndPointOfSchedules_ArrivalTimeBeforeAndPointOfSchedules_TrainEntity(
 //                        passenger,

@@ -17,7 +17,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
-import javax.validation.Valid;
 import java.util.List;
 
 @RequiredArgsConstructor
@@ -73,8 +72,8 @@ public class AdminController {
     }
 
     @GetMapping("/train/all")
-    public ResponseEntity<List<TrainDto>> getAllTrains() {
-        List<TrainDto> trains = trainService.getAllTrains();
+    public ResponseEntity<List<TrainDto>> getAllTrainsFromPast(@RequestParam(name="param") String param) {
+        List<TrainDto> trains = trainService.getAllTrains(param);
         return new ResponseEntity<>(trains, HttpStatus.OK);
     }
 

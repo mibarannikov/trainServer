@@ -10,9 +10,11 @@ import java.util.Optional;
 public interface TrainEntityRepository extends JpaRepository<TrainEntity, Long> {
 
     Optional<TrainEntity> findByTrainNumber(Long trainNumber);
-    List<TrainEntity> findAllByOrderByDepartureTimeAsc();
+    List<TrainEntity> findAllByOrderByDepartureTimeDesc();
 
     List<TrainEntity> findByPointOfSchedules_DepartureTimeAfter(LocalDateTime departureTime);
+
+    List<TrainEntity> findByArrivalTimeEndBeforeOrderByDepartureTimeDesc(LocalDateTime arrivalTimeEnd);
 
     List<TrainEntity> findByArrivalTimeEndAfter(LocalDateTime arrivalTimeEnd);
 

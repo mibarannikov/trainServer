@@ -51,9 +51,10 @@ public class TicketController {
 
     @GetMapping("/searchseats")
     ResponseEntity<List<SeatEntityDto>> emptySeats(@RequestParam(name = "train") Long trainNumber,
+                                                   @RequestParam(name="wagon") Long wagonNumber,
                                                    @RequestParam(name = "start") String startStation,
                                                    @RequestParam(name = "end") String endStation) {
-        List<SeatEntityDto> seats = trainService.getEmptySeats(trainNumber, startStation, endStation);
+        List<SeatEntityDto> seats = trainService.getEmptySeats(trainNumber, startStation, endStation,wagonNumber);
         return new ResponseEntity<>(seats, HttpStatus.OK);
 
     }
