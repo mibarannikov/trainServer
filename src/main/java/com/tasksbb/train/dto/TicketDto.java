@@ -13,6 +13,8 @@ import java.util.List;
 public class TicketDto {
     private Long id;
     @NotEmpty
+    private Long wagonNumber;
+    @NotEmpty
     private Long seatNumber;
     @NotEmpty
     private String firstnamePassenger;

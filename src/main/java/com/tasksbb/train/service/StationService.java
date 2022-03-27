@@ -10,6 +10,7 @@ import com.tasksbb.train.facade.StationFacade;
 import com.tasksbb.train.repository.PointOfScheduleRepository;
 import com.tasksbb.train.repository.StationEntityRepository;
 import com.tasksbb.train.repository.TrainEntityRepository;
+import com.tasksbb.train.repository.WagonEntityRepository;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,6 +20,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.*;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
@@ -31,10 +33,10 @@ public class StationService {
     public final PointOfScheduleRepository pointOfScheduleRepository;
 
     public final TrainEntityRepository trainEntityRepository;
+    public final WagonEntityRepository wagonEntityRepository;
 
 
     public List<StationEntity> findAllStation() {
-
         return stationEntityRepository.findByOrderByNameStationAsc();
     }
 
@@ -53,14 +55,14 @@ public class StationService {
             try {
                 return stationEntityRepository.save(station);
             } catch (Exception ex) {
-                throw new StationExistException("station with name " + stationDto.getNameStation() + "already exist");
+                throw new StationExistException("station with name " + stationDto.getNameStation() + "already exist");// todo переделать
             }
         }
         station.setCanGetStations(new LinkedHashSet<>());
         try {
             return stationEntityRepository.save(station);
         } catch (Exception ex) {
-            throw new StationExistException("station with name " + stationDto.getNameStation() + "already exist");
+            throw new StationExistException("station with name " + stationDto.getNameStation() + "already exist");//todo переделать
         }
     }
 
@@ -135,10 +137,15 @@ public class StationService {
         stationEntityRepository.save(station);
     }
 
+
     private void setStatusPointOfSchedule(StationEntity station, StationEntity changeStation, Integer status) {
         List<PointOfScheduleEntity> savePoints = new ArrayList<>();
         List<PointOfScheduleEntity> point1 = pointOfScheduleRepository.findByStationEntity_IdAndDepartureTimeAfter(station.getId(), LocalDateTime.now());
         List<PointOfScheduleEntity> point2 = pointOfScheduleRepository.findByStationEntity_IdAndDepartureTimeAfter(changeStation.getId(), LocalDateTime.now());
+
+//        Predicate<PointOfScheduleEntity> predicateTrain = p-> point2.stream().anyMatch(p1->p.getTrainEntity().equals(p1.getTrainEntity()));
+//        point1.stream().filter(point->{point2})
+
         for (PointOfScheduleEntity p1 : point1) {
             for (PointOfScheduleEntity p2 : point2) {
                 if (p1.getTrainEntity().equals(p2.getTrainEntity())
@@ -157,9 +164,12 @@ public class StationService {
         pointOfScheduleRepository.saveAll(savePoints);
     }
 
+
+
     private void updatePointOfSchedule(StationEntity station, Double lat, Double lon) {
         List<TrainEntity> trains = trainEntityRepository.findByPointOfSchedules_StationEntity_Id(station.getId());
         boolean afterFindStation = false;
+
         for (TrainEntity tr : trains) {
             for (int i = 0; i < tr.getPointOfSchedules().size(); i++) {
                 if (tr.getPointOfSchedules().get(i).getStationEntity().getId() == station.getId()) {
@@ -169,13 +179,16 @@ public class StationService {
                     afterFindStation = true;
                 }
                 if ((i > 0) && afterFindStation) {
-                    double latRad = tr.getPointOfSchedules().get(i).getStationEntity().getLatitude() * 3.141592 / 180;
-                    double lonRad = tr.getPointOfSchedules().get(i).getStationEntity().getLongitude() * 3.141592 / 180;
-                    double latRadPre = tr.getPointOfSchedules().get(i - 1).getStationEntity().getLatitude() * 3.141592 / 180;
-                    double lonRadPre = tr.getPointOfSchedules().get(i - 1).getStationEntity().getLongitude() * 3.141592 / 180;
-                    double delta = 2 * Math.asin(Math.sqrt(Math.pow(Math.sin((latRad - latRadPre)) * 0.5, 2)
-                            + Math.cos(latRad) * Math.cos(latRadPre) * Math.pow(Math.sin((lonRad - lonRadPre) * 0.5), 2)));
-                    double newDistance = delta * 6372795;
+//                    double latRad = tr.getPointOfSchedules().get(i).getStationEntity().getLatitude() * 3.141592 / 180;
+//                    double lonRad = tr.getPointOfSchedules().get(i).getStationEntity().getLongitude() * 3.141592 / 180;
+//                    double latRadPre = tr.getPointOfSchedules().get(i - 1).getStationEntity().getLatitude() * 3.141592 / 180;
+//                    double lonRadPre = tr.getPointOfSchedules().get(i - 1).getStationEntity().getLongitude() * 3.141592 / 180;
+//                    double delta = 2 * Math.asin(Math.sqrt(Math.pow(Math.sin((latRad - latRadPre)) * 0.5, 2)
+//                            + Math.cos(latRad) * Math.cos(latRadPre) * Math.pow(Math.sin((lonRad - lonRadPre) * 0.5), 2)));
+//                    double newDistance = delta * 6372795;
+
+                    double newDistance = distanceCalculation(tr.getPointOfSchedules().get(i),tr.getPointOfSchedules().get(i - 1));
+
                     long sec = (long) Math.floor((newDistance / (tr.getTrainSpeed() * 0.2777)) - 10);
                     if (tr.getPointOfSchedules().get(i).getArrivalTime().isBefore(tr.getPointOfSchedules().get(i - 1).getDepartureTime().plusSeconds(sec))) {
                         long trainStopSecond = tr.getPointOfSchedules().get(i).getDepartureTime().toEpochSecond(ZoneOffset.of("+0")) -
@@ -190,5 +203,17 @@ public class StationService {
                 }
             }
         }
+    }
+
+    public double distanceCalculation(PointOfScheduleEntity point1, PointOfScheduleEntity point2){
+        double latRad = point1.getStationEntity().getLatitude() * 3.141592 / 180;
+        double lonRad = point1.getStationEntity().getLongitude() * 3.141592 / 180;
+        double latRadPre = point2.getStationEntity().getLatitude() * 3.141592 / 180;
+        double lonRadPre = point2.getStationEntity().getLongitude() * 3.141592 / 180;
+        double delta = 2 * Math.asin(Math.sqrt(Math.pow(Math.sin((latRad - latRadPre)) * 0.5, 2)
+                + Math.cos(latRad) * Math.cos(latRadPre) * Math.pow(Math.sin((lonRad - lonRadPre) * 0.5), 2)));
+        double Distance = delta * 6372795;
+        return Distance;
+
     }
 }

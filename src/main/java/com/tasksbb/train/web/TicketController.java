@@ -1,6 +1,7 @@
 package com.tasksbb.train.web;
 
-import com.tasksbb.train.dto.SeatEntityDto;
+import com.tasksbb.train.dto.PriceDto;
+import com.tasksbb.train.dto.SeatDto;
 import com.tasksbb.train.dto.TicketDto;
 import com.tasksbb.train.entity.User;
 import com.tasksbb.train.service.TicketService;
@@ -14,6 +15,7 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
+import java.util.ArrayList;
 import java.util.List;
 
 
@@ -50,13 +52,24 @@ public class TicketController {
     }
 
     @GetMapping("/searchseats")
-    ResponseEntity<List<SeatEntityDto>> emptySeats(@RequestParam(name = "train") Long trainNumber,
-                                                   @RequestParam(name="wagon") Long wagonNumber,
-                                                   @RequestParam(name = "start") String startStation,
-                                                   @RequestParam(name = "end") String endStation) {
-        List<SeatEntityDto> seats = trainService.getEmptySeats(trainNumber, startStation, endStation,wagonNumber);
+    ResponseEntity<List<SeatDto>> emptySeats(@RequestParam(name = "train") Long trainNumber,
+                                             @RequestParam(name = "wagon") Long wagonNumber,
+                                             @RequestParam(name = "start") String startStation,
+                                             @RequestParam(name = "end") String endStation) {
+        List<SeatDto> seats = trainService.getEmptySeats(trainNumber, startStation, endStation, wagonNumber);
         return new ResponseEntity<>(seats, HttpStatus.OK);
 
+    }
+
+    @GetMapping("/ticketprice")
+    ResponseEntity<PriceDto> ticketPrice(@RequestParam(name = "train") Long trainNumber,
+                                         @RequestParam(name = "wagon") Long wagonNumber,
+                                         @RequestParam(name = "start") String startStation,
+                                         @RequestParam(name = "end") String endStation) {
+        String price = ticketService.priceCalculation(trainNumber, wagonNumber, startStation, endStation);
+       PriceDto pr = new PriceDto();
+       pr.setPrice(price);
+        return new ResponseEntity<>(pr, HttpStatus.OK);
     }
 
 

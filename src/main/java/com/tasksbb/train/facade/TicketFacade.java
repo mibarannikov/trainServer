@@ -3,6 +3,7 @@ package com.tasksbb.train.facade;
 import com.tasksbb.train.dto.TicketDto;
 import com.tasksbb.train.entity.PointOfScheduleEntity;
 import com.tasksbb.train.entity.TicketEntity;
+import com.tasksbb.train.entity.WagonEntity;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -16,14 +17,19 @@ public class TicketFacade {
         ticketDto.setFirstnamePassenger(ticket.getPassengerEntity().getFirstname());
         ticketDto.setLastnamePassenger(ticket.getPassengerEntity().getLastname());
         ticketDto.setDateOfBirth(ticket.getPassengerEntity().getDateOfBirth());
-        ticketDto.setSeatNumber(ticket.getSeatEntity().getSeatNumber());
         ticketDto.setNumberTrainOwner(ticket.getSeatEntity().getTrainEntity().getTrainNumber());
-//        List<PointOfScheduleEntity> points = new ArrayList<>();
-//        for(PointOfScheduleEntity p: ticket.getSeatEntity().getTrainEntity().getPointOfSchedules()){
-//            if(p.getArrivalTime().isAfter(ticket.getPointOfSchedules().get(ticket.getPointOfSchedules().size()-1).getArrivalTime())){
-//                ticket.getPointOfSchedules().add(p);break;
-//            }
-//        }
+        Long seatNumberDto = ticket.getSeatEntity().getSeatNumber();
+        Long wagonNumber = 0L;
+        for (WagonEntity w: ticket.getSeatEntity().getTrainEntity().getWagonEntities()){
+            seatNumberDto-=w.getSumSeats();
+            if (seatNumberDto<=0){
+                seatNumberDto+=w.getSumSeats();
+                wagonNumber=w.getWagonNumber();
+                break;
+            }
+        }
+        ticketDto.setSeatNumber(seatNumberDto);
+        ticketDto.setWagonNumber(wagonNumber);
         ticketDto.setNameStations(ticket.getPointOfSchedules()
                 .stream()
                 .map(PointOfScheduleFacade::pointEntityToPointDto)

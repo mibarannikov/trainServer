@@ -4,20 +4,15 @@ import com.tasksbb.train.dto.PointOfScheduleDto;
 import com.tasksbb.train.dto.TicketDto;
 import com.tasksbb.train.entity.*;
 import com.tasksbb.train.ex.ScheduleNotFoundException;
+import com.tasksbb.train.ex.TrainNotFoundException;
 import com.tasksbb.train.facade.TicketFacade;
-import com.tasksbb.train.repository.PassengerEntityRepository;
-import com.tasksbb.train.repository.PointOfScheduleRepository;
-import com.tasksbb.train.repository.SeatEntityRepository;
-import com.tasksbb.train.repository.TicketEntityRepository;
+import com.tasksbb.train.repository.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
@@ -34,6 +29,10 @@ public class TicketService {
 
     private final PassengerService passengerService;
 
+    private final TrainEntityRepository trainEntityRepository;
+
+    private final StationService stationService;
+
     @Transactional
     public TicketDto buyTicket(TicketDto ticketDto, User user) {
         if (!timeValidationTicket(ticketDto)) {
@@ -41,8 +40,19 @@ public class TicketService {
             return ticketDto;
         }
         TicketEntity newTicket = new TicketEntity();
+        TrainEntity train = trainEntityRepository.findByTrainNumber(ticketDto.getNumberTrainOwner())
+                .orElseThrow(() -> new TrainNotFoundException("Not found train with number " + ticketDto.getNumberTrainOwner()));
+        Long amountSeats = 0L;
+        for (WagonEntity w : train.getWagonEntities()) {
+            if (w.getWagonNumber() == ticketDto.getWagonNumber()) {
+                break;
+            }
+            amountSeats += w.getSumSeats();
+        }
+        amountSeats += ticketDto.getSeatNumber();
+
         SeatEntity seat = seatEntityRepository
-                .findByTrainEntityTrainNumberAndSeatNumber(ticketDto.getNumberTrainOwner(), ticketDto.getSeatNumber());// todo orElseThrow()
+                .findByTrainEntityTrainNumberAndSeatNumber(ticketDto.getNumberTrainOwner(), amountSeats);// todo orElseThrow()
 
         for (PointOfScheduleDto name : ticketDto.getNameStations()) {
             newTicket.getPointOfSchedules()
@@ -120,20 +130,32 @@ public class TicketService {
                 .collect(Collectors.toList());
     }
 
-    // private boolean registeredTicket(TicketEntity ticket) {
-    //     boolean before = false;
-    //     boolean after = false;
-    //     for (PointOfScheduleEntity point : ticket.getPointOfSchedules()) {
-    //         if (point.getArrivalTime().isBefore(LocalDateTime.now())) {
-    //             before = true;
-    //         }
-//            if (point.getArrivalTime().isAfter(LocalDateTime.now())) {
-//                after = true;
-//            }
-//            if (after && before) {
-//                return true;
-//            }
-//        }
-//        return false;
-//    }
+    public String priceCalculation(Long trainNumber, Long wagonNumber, String startStation, String endStation) {
+        TrainEntity train = trainEntityRepository.findByTrainNumber(trainNumber)
+                .orElseThrow(() -> new TrainNotFoundException("Train with trainNumber " + trainNumber + "not found"));
+        double totalDistance = 0.0;
+        for (int i = train.getPointOfSchedules().indexOf(pointOfScheduleRepository.findByTrainEntityAndStationEntityNameStation(train, startStation).get()) + 1;
+             i <= train.getPointOfSchedules().indexOf(pointOfScheduleRepository.findByTrainEntityAndStationEntityNameStation(train, endStation).get()); i++) {
+
+            totalDistance += stationService.distanceCalculation(train.getPointOfSchedules().get(i), train.getPointOfSchedules().get(i - 1));
+        }
+        Double coeffTypeWagon = 0.0;
+        switch (train.getWagonEntities().stream().filter(wagon -> Objects.equals(wagon.getWagonNumber(), wagonNumber)).findFirst().get().getType()) {
+            case "coupe": {
+                coeffTypeWagon = PriceConstants.COUPE_COEFFICIENT;
+                break;
+            }
+            case "platzkarte": {
+                coeffTypeWagon = PriceConstants.PLAZCARTE_COEFFICIENT;
+                break;
+            }
+            default: {
+                coeffTypeWagon = 1.0;
+                break;
+            }
+        }
+        double price = totalDistance * PriceConstants.PRICE_PER_KILOMETER * coeffTypeWagon * train.getTrainSpeed() * PriceConstants.SPEED_COEFFICIENT;
+        return String.format(Locale.FRANCE, "%,.2f", price) + "RUB";
+    }
+
 }

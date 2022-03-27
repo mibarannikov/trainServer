@@ -1,7 +1,7 @@
 package com.tasksbb.train.web;
 
 import com.tasksbb.train.dto.TicketDto;
-import com.tasksbb.train.dto.UserDTO;
+import com.tasksbb.train.dto.UserDto;
 import com.tasksbb.train.entity.User;
 import com.tasksbb.train.facade.UserFacade;
 import com.tasksbb.train.service.TicketService;
@@ -36,9 +36,9 @@ public class UserController {
     }
 
     @GetMapping("/")
-    public ResponseEntity<UserDTO> getCurrentUser(Principal principal) {
+    public ResponseEntity<UserDto> getCurrentUser(Principal principal) {
         User user = userService.getCurrentUser(principal);
-        UserDTO userDTO = userFacade.userToUserDTO(user);
+        UserDto userDTO = userFacade.userToUserDTO(user);
 
         return new ResponseEntity<>(userDTO, HttpStatus.OK);
     }
