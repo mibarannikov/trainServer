@@ -35,6 +35,7 @@ public class TrainController {
         return new ResponseEntity<>(trains, HttpStatus.OK);
     }
 
+
 //    @GetMapping("/freeseats")
 //    public
 //    ResponseEntity<List<SeatEntityDto>> getFreeSeats(@RequestParam(name = "train") Long trainNumber,

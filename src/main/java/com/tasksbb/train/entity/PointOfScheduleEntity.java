@@ -1,6 +1,7 @@
 package com.tasksbb.train.entity;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.tasksbb.train.entity.enums.EStatus;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -36,8 +37,13 @@ public class PointOfScheduleEntity  extends DateCreateUpdate{
     @Column(name = "departure_time_init")
     private LocalDateTime departureTimeInit;
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "delay",nullable = false)
-    private Integer delayed;
+    private EStatus delayed;
+
+//    @Enumerated(EnumType.STRING)
+//    @Column(name = "status")
+//    private EStatus status;
 
     @ManyToOne(cascade = CascadeType.ALL, optional = false, fetch = FetchType.EAGER)
     @JoinColumn(name = "train_entity_id", nullable = false)
@@ -49,7 +55,7 @@ public class PointOfScheduleEntity  extends DateCreateUpdate{
         super.onCreate();
         this.arrivalTimeInit = this.arrivalTime;
         this.departureTimeInit = this.departureTime;
-        this.delayed=0;
+        this.delayed=EStatus.schedule;
     }
 
 

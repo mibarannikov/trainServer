@@ -3,6 +3,7 @@ package com.tasksbb.train.dto;
 
 
 
+import com.tasksbb.train.entity.enums.EStatus;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -23,5 +24,5 @@ public class PointOfScheduleDto {
 
     private LocalDateTime departureTimeInit;
 
-    private int delayed;
+    private EStatus delayed;
 }

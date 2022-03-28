@@ -1,9 +1,11 @@
 package com.tasksbb.train.service;
 
+import com.tasksbb.train.dto.PointOfScheduleDto;
 import com.tasksbb.train.dto.SeatDto;
 import com.tasksbb.train.dto.TrainDto;
 import com.tasksbb.train.dto.WagonDto;
 import com.tasksbb.train.entity.*;
+import com.tasksbb.train.entity.enums.EStatus;
 import com.tasksbb.train.ex.ScheduleNotFoundException;
 import com.tasksbb.train.ex.StationNotFoundException;
 import com.tasksbb.train.ex.TrainNotFoundException;
@@ -21,6 +23,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -29,6 +32,8 @@ import java.util.stream.Collectors;
 @Service
 public class TrainService {
     public static final Logger LOG = LoggerFactory.getLogger(TrainService.class);
+
+    private static final Long MINIMUM_BOARDING_TIME = 120L;
 
     private final TrainEntityRepository trainEntityRepository;
 
@@ -56,7 +61,6 @@ public class TrainService {
             wagon.setTrainEntity(addTrain);
             addTrain.getWagonEntities().add(wagon);
         }
-
         for (int i = 1; i <= trainDto.getSumSeats(); i++) {
             SeatEntity s = new SeatEntity();
             s.setSeatNumber((long) i);
@@ -90,7 +94,7 @@ public class TrainService {
             for (PointOfScheduleEntity pe : pointsEnd) {
                 if ((p.getTrainEntity().getTrainNumber() == pe.getTrainEntity().getTrainNumber())
                         && (p.getDepartureTime().isBefore(pe.getArrivalTime()))
-                        && (p.getDelayed() != 3) && (pe.getDelayed() != 3)) {
+                        && (p.getDelayed() != EStatus.cancel) && (pe.getDelayed() != EStatus.cancel)) {
                     p.getTrainEntity().setAmountOfEmptySeats((long) emptySeats(p.getTrainEntity(), p, pe).size());
                     trains.add(p.getTrainEntity());
                 }
@@ -204,4 +208,67 @@ public class TrainService {
     public List<WagonDto> findAllWagon() {
         return wagonEntityRepository.findAll().stream().map(WagonFacade::wagonToWagonDto).collect(Collectors.toList());
     }
+
+    public TrainDto findTrain(Long trainNumber) {
+        return TrainFacade.trainToDto(trainEntityRepository.findByTrainNumber(trainNumber)
+                .orElseThrow(() -> new TrainNotFoundException("Train with trainNumber " + trainNumber + "not found")));
+    }
+
+    @Transactional
+    public TrainDto rollBackTrain(TrainDto trainDto) {
+        //     trainDto.getPointsOfSchedule().forEach(point -> {
+        for (PointOfScheduleDto point : trainDto.getPointsOfSchedule()) {
+            PointOfScheduleEntity p = pointOfScheduleRepository.findById(point.getId())
+                    .orElseThrow();
+            p.setDelayed(point.getDelayed());
+            p.setDepartureTime(point.getDepartureTime());
+            p.setArrivalTime(point.getArrivalTime());
+            pointOfScheduleRepository.save(p);
+        }
+        //  });
+        return TrainFacade.trainToDto(trainEntityRepository.findByTrainNumber(trainDto.getTrainNumber()).get());
+    }
+
+    @Transactional
+    public TrainDto updateTrain(TrainDto trainDto) {
+        TrainEntity train = trainEntityRepository.findByTrainNumber(trainDto.getTrainNumber())
+                .orElseThrow(() -> new TrainNotFoundException("Train with trainNumber " + trainDto.getTrainNumber() + "not found"));
+        for (int i = 0; i < train.getPointOfSchedules().size(); i++) {
+            if (train.getPointOfSchedules().get(i).getDepartureTime().isBefore(trainDto.getPointsOfSchedule().get(i).getDepartureTime())) {
+                if( i<train.getPointOfSchedules().size()-1){
+                    trainDto.getPointsOfSchedule().get(i+1).setArrivalTime(trainDto.getPointsOfSchedule().get(i+1).getArrivalTime()
+                            .plusSeconds(trainDto.getPointsOfSchedule().get(i).getDepartureTime().toEpochSecond(ZoneOffset.of("+0"))
+                                    -train.getPointOfSchedules().get(i).getDepartureTime().toEpochSecond(ZoneOffset.of("+0"))));
+                }
+
+                train.getPointOfSchedules().get(i).setDepartureTime(trainDto.getPointsOfSchedule().get(i).getDepartureTime());
+
+            }
+            Long delta = trainDto.getPointsOfSchedule().get(i).getArrivalTime().toEpochSecond(ZoneOffset.of("+0"))
+                    - train.getPointOfSchedules().get(i).getArrivalTime().toEpochSecond(ZoneOffset.of("+0"));
+            for(int j=i;j< train.getPointOfSchedules().size(); j++) {
+                if (delta > 0) {
+                    train.getPointOfSchedules().get(j).setDelayed(EStatus.running_with_errors);
+                    train.getPointOfSchedules().get(j).setArrivalTime(train.getPointOfSchedules().get(j).getArrivalTime().plusSeconds(delta));
+                    if ((train.getPointOfSchedules().get(j).getDepartureTime().toEpochSecond(ZoneOffset.of("+0"))
+                            - train.getPointOfSchedules().get(j).getArrivalTime().toEpochSecond(ZoneOffset.of("+0"))) < MINIMUM_BOARDING_TIME) {
+                        delta = train.getPointOfSchedules().get(j).getArrivalTime().toEpochSecond(ZoneOffset.of("+0")) + MINIMUM_BOARDING_TIME
+                                - train.getPointOfSchedules().get(j).getDepartureTime().toEpochSecond(ZoneOffset.of("+0"));
+                        train.getPointOfSchedules().get(j).setDepartureTime(train.getPointOfSchedules().get(j).getArrivalTime().plusSeconds(MINIMUM_BOARDING_TIME));
+                    }else {delta=0L;}
+                }
+            }
+
+
+            if (trainDto.getPointsOfSchedule().get(i).getDelayed() == EStatus.cancel) {
+                train.getPointOfSchedules().stream().skip(i).forEach(point -> point.setDelayed(EStatus.cancel));
+                break;
+            }
+
+        }
+        train = trainEntityRepository.save(train);
+
+        return TrainFacade.trainToDto(train);
+    }
 }
+

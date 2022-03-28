@@ -58,7 +58,17 @@ public class AdminController {
         return new ResponseEntity<>(station, HttpStatus.OK);
     }
 
+    @PutMapping("/train/rollback")
+    public ResponseEntity<TrainDto> rollBackTrain(@RequestBody TrainDto trainDto, BindingResult bindingResult){
 
+        return new ResponseEntity<>(trainService.rollBackTrain(trainDto), HttpStatus.OK);
+    }
+
+    @PutMapping("/train/update")
+    public ResponseEntity<TrainDto> updateTrain(@RequestBody TrainDto trainDto,BindingResult bindingResult){
+
+        return new ResponseEntity<>(trainService.updateTrain(trainDto), HttpStatus.OK);
+    }
     @PostMapping("/train/add")
     public ResponseEntity<TrainDto> addTrain( @RequestBody TrainDto trainDto,
                                            BindingResult bindingResult) {
@@ -93,4 +103,9 @@ public class AdminController {
         return new ResponseEntity<>(ticketService.ticketsOnTheTrainNow(trainNumber), HttpStatus.OK);
     }
 
+    @GetMapping("/train/find")
+    public ResponseEntity<TrainDto> train(@RequestParam(name = "trainNumber") Long trainNumber){
+
+        return new ResponseEntity<>(trainService.findTrain(trainNumber), HttpStatus.OK);
+    }
 }
