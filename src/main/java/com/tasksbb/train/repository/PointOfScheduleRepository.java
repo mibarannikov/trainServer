@@ -29,7 +29,7 @@ public interface PointOfScheduleRepository extends JpaRepository<PointOfSchedule
     List<PointOfScheduleEntity> findByTrainEntityTrainNumberAndDepartureTimeBeforeOrderByArrivalTimeAsc(Long trainNumber, LocalDateTime now);
     Optional<PointOfScheduleEntity> findFirstByTrainEntityTrainNumberAndArrivalTimeBeforeOrderByArrivalTimeDesc(Long trainNumber, LocalDateTime now);
     List<PointOfScheduleEntity> findAllByStationEntityNameStationAndArrivalTimeAfterOrderByArrivalTime(String nameStation, LocalDateTime now);
-
+    List<PointOfScheduleEntity> findAllByArrivalTimeAfterOrderByArrivalTime(LocalDateTime now);
     List<PointOfScheduleEntity> findByStationEntity_NameStationAndDepartureTimeAfterAndDepartureTimeBeforeOrderByDepartureTimeAsc(String nameStation, LocalDateTime departureTime, LocalDateTime departureTime1);
 
 }

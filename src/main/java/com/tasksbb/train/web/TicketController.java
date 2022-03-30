@@ -8,6 +8,7 @@ import com.tasksbb.train.service.TicketService;
 import com.tasksbb.train.service.TrainService;
 import com.tasksbb.train.service.UserService;
 import com.tasksbb.train.validations.ResponseErrorValidation;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -23,6 +24,7 @@ import java.util.List;
 @RequestMapping("api/ticket")
 @CrossOrigin
 @PreAuthorize("permitAll()")
+@RequiredArgsConstructor
 public class TicketController {
 
 
@@ -34,12 +36,6 @@ public class TicketController {
 
     private final TrainService trainService;
 
-    public TicketController(UserService userService, ResponseErrorValidation responseErrorValidation, TicketService ticketService, TrainService trainService) {
-        this.userService = userService;
-        this.responseErrorValidation = responseErrorValidation;
-        this.ticketService = ticketService;
-        this.trainService = trainService;
-    }
 
     @PostMapping("/buyticket")
     ResponseEntity<Object> buyTicket(@RequestBody TicketDto ticket, BindingResult bindingResult, Principal principal) {

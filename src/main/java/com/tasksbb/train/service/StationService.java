@@ -31,6 +31,7 @@ import java.util.stream.Collectors;
 @Service
 public class StationService {
     public static final Logger LOG = LoggerFactory.getLogger(StationService.class);
+
     private static final Double EARTH_RADIUS = 6372795.0;
 
     public final StationEntityRepository stationEntityRepository;
@@ -42,15 +43,11 @@ public class StationService {
 
 
     public List<StationEntity> findAllStation() {
-        script();
+
         return stationEntityRepository.findByOrderByNameStationAsc();
     }
 
-    private void script(){
-        List<PointOfScheduleEntity> points = pointOfScheduleRepository.findAll();
-        points.forEach(point -> point.setDelayed(EStatus.schedule));
-        pointOfScheduleRepository.saveAll(points);
-    }
+
 
     public StationEntity addStation(StationDto stationDto) {
 
@@ -86,8 +83,14 @@ public class StationService {
 
     public List<StationDto> findAllSearchStation(String value) {
 
-        return stationEntityRepository.findByNameStationStartsWithOrderByNameStationAsc(value)
-                .stream()
+        List<StationEntity> searchStation;
+        if (value.equals("all")){
+            searchStation = stationEntityRepository.findByOrderByNameStationAsc();
+        } else{
+            searchStation = stationEntityRepository.findByNameStationStartsWithOrderByNameStationAsc(value);
+        }
+
+        return searchStation.stream()
                 .map(StationFacade::stationToStationDto)
                 .collect(Collectors.toList());
     }

@@ -19,6 +19,7 @@ import com.tasksbb.train.repository.WagonEntityRepository;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.jms.core.JmsTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -26,6 +27,7 @@ import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
@@ -42,6 +44,8 @@ public class TrainService {
     private final PointOfScheduleRepository pointOfScheduleRepository;
 
     private final WagonEntityRepository wagonEntityRepository;
+
+
 
 
     @Transactional
@@ -190,9 +194,14 @@ public class TrainService {
     }
 
     public List<TrainDto> getTrainSchedule(String nameStation) {
-        List<PointOfScheduleEntity> points = pointOfScheduleRepository
-                .findAllByStationEntityNameStationAndArrivalTimeAfterOrderByArrivalTime(nameStation, LocalDateTime.now());
-
+        List<PointOfScheduleEntity> points;
+        if (Objects.equals(nameStation, "all")){
+            points = pointOfScheduleRepository
+                    .findAllByArrivalTimeAfterOrderByArrivalTime(LocalDateTime.now());
+        }else {
+             points = pointOfScheduleRepository
+                    .findAllByStationEntityNameStationAndArrivalTimeAfterOrderByArrivalTime(nameStation, LocalDateTime.now());
+        }
         LOG.info("time now " + LocalDateTime.now());
         return points.stream()
                 .map(point -> TrainFacade.trainToDto(point.getTrainEntity()))
@@ -233,8 +242,13 @@ public class TrainService {
     public TrainDto updateTrain(TrainDto trainDto) {
         TrainEntity train = trainEntityRepository.findByTrainNumber(trainDto.getTrainNumber())
                 .orElseThrow(() -> new TrainNotFoundException("Train with trainNumber " + trainDto.getTrainNumber() + "not found"));
+
+
         for (int i = 0; i < train.getPointOfSchedules().size(); i++) {
-            if (train.getPointOfSchedules().get(i).getDepartureTime().isBefore(trainDto.getPointsOfSchedule().get(i).getDepartureTime())) {
+        if(train.getPointOfSchedules().get(i).getDelayed()!=trainDto.getPointsOfSchedule().get(i).getDelayed()){
+            train.getPointOfSchedules().get(i).setDelayed(trainDto.getPointsOfSchedule().get(i).getDelayed());
+        }
+            if (train.getPointOfSchedules().get(i).getDepartureTimeInit().isBefore(trainDto.getPointsOfSchedule().get(i).getDepartureTime())) {
                 if( i<train.getPointOfSchedules().size()-1){
                     trainDto.getPointsOfSchedule().get(i+1).setArrivalTime(trainDto.getPointsOfSchedule().get(i+1).getArrivalTime()
                             .plusSeconds(trainDto.getPointsOfSchedule().get(i).getDepartureTime().toEpochSecond(ZoneOffset.of("+0"))
@@ -245,20 +259,28 @@ public class TrainService {
 
             }
             Long delta = trainDto.getPointsOfSchedule().get(i).getArrivalTime().toEpochSecond(ZoneOffset.of("+0"))
-                    - train.getPointOfSchedules().get(i).getArrivalTime().toEpochSecond(ZoneOffset.of("+0"));
+                    - train.getPointOfSchedules().get(i).getArrivalTimeInit().toEpochSecond(ZoneOffset.of("+0"));
             for(int j=i;j< train.getPointOfSchedules().size(); j++) {
                 if (delta > 0) {
-                    train.getPointOfSchedules().get(j).setDelayed(EStatus.running_with_errors);
-                    train.getPointOfSchedules().get(j).setArrivalTime(train.getPointOfSchedules().get(j).getArrivalTime().plusSeconds(delta));
+                   // train.getPointOfSchedules().get(j).setDelayed(EStatus.running_with_errors);
+                    train.getPointOfSchedules().get(j).setArrivalTime(train.getPointOfSchedules().get(j).getArrivalTimeInit().plusSeconds(delta));
                     if ((train.getPointOfSchedules().get(j).getDepartureTime().toEpochSecond(ZoneOffset.of("+0"))
                             - train.getPointOfSchedules().get(j).getArrivalTime().toEpochSecond(ZoneOffset.of("+0"))) < MINIMUM_BOARDING_TIME) {
                         delta = train.getPointOfSchedules().get(j).getArrivalTime().toEpochSecond(ZoneOffset.of("+0")) + MINIMUM_BOARDING_TIME
                                 - train.getPointOfSchedules().get(j).getDepartureTime().toEpochSecond(ZoneOffset.of("+0"));
                         train.getPointOfSchedules().get(j).setDepartureTime(train.getPointOfSchedules().get(j).getArrivalTime().plusSeconds(MINIMUM_BOARDING_TIME));
-                    }else {delta=0L;}
+
+                    }else {
+                        delta=0L;
+                     //   train.getPointOfSchedules().get(j).setDelayed(EStatus.schedule);
+                    }
                 }
             }
-
+            train.getPointOfSchedules().forEach(p->{
+                if(p.getArrivalTime().isAfter(p.getArrivalTimeInit())) {
+                    p.setDelayed(EStatus.running_with_errors);
+                }
+            });
 
             if (trainDto.getPointsOfSchedule().get(i).getDelayed() == EStatus.cancel) {
                 train.getPointOfSchedules().stream().skip(i).forEach(point -> point.setDelayed(EStatus.cancel));

@@ -50,6 +50,5 @@ public class StationController {
         List<TrainDto> trains = trainService.getTrainSchedule(nameStation);
 
         return new ResponseEntity<>(trains,HttpStatus.OK);
-
     }
 }
