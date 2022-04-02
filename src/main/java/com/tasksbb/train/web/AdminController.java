@@ -61,6 +61,7 @@ public class AdminController {
 //            return errors;
 //        }
         StationDto station = stationService.editStation(stationDto);
+        jmsTemplate.convertAndSend("one", "update");
         return new ResponseEntity<>(station, HttpStatus.OK);
     }
 
@@ -90,6 +91,7 @@ public class AdminController {
 //            return errors;
 //        }
         TrainEntity train = trainService.addTrain(trainDto);
+        jmsTemplate.convertAndSend("one", "update");
         return new ResponseEntity<>(TrainFacade.trainToDto(train), HttpStatus.OK);
     }
 

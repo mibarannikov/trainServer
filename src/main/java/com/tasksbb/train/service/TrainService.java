@@ -1,9 +1,6 @@
 package com.tasksbb.train.service;
 
-import com.tasksbb.train.dto.PointOfScheduleDto;
-import com.tasksbb.train.dto.SeatDto;
-import com.tasksbb.train.dto.TrainDto;
-import com.tasksbb.train.dto.WagonDto;
+import com.tasksbb.train.dto.*;
 import com.tasksbb.train.entity.*;
 import com.tasksbb.train.entity.enums.EStatus;
 import com.tasksbb.train.ex.ScheduleNotFoundException;
@@ -11,6 +8,7 @@ import com.tasksbb.train.ex.StationNotFoundException;
 import com.tasksbb.train.ex.TrainNotFoundException;
 import com.tasksbb.train.facade.SeatFacade;
 import com.tasksbb.train.facade.TrainFacade;
+import com.tasksbb.train.facade.TransferFacade;
 import com.tasksbb.train.facade.WagonFacade;
 import com.tasksbb.train.repository.PointOfScheduleRepository;
 import com.tasksbb.train.repository.StationEntityRepository;
@@ -19,7 +17,6 @@ import com.tasksbb.train.repository.WagonEntityRepository;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.jms.core.JmsTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -44,8 +41,6 @@ public class TrainService {
     private final PointOfScheduleRepository pointOfScheduleRepository;
 
     private final WagonEntityRepository wagonEntityRepository;
-
-
 
 
     @Transactional
@@ -90,9 +85,12 @@ public class TrainService {
         if (startTimePeriod.isBefore(LocalDateTime.now())) {
             startTimePeriod = LocalDateTime.now();
         }
+        if (startTimePeriod.isAfter(endTimePeriod)) {
+            endTimePeriod = endTimePeriod.plusMonths(1);
+        }
         List<PointOfScheduleEntity> pointsStart = pointOfScheduleRepository
                 .findByStationEntity_NameStationAndDepartureTimeAfterAndDepartureTimeBeforeOrderByDepartureTimeAsc(startStationName, startTimePeriod, endTimePeriod);
-        List<PointOfScheduleEntity> pointsEnd = pointOfScheduleRepository.findAllByStationEntityNameStationOrderByArrivalTimeAsc(endStationName);
+        List<PointOfScheduleEntity> pointsEnd = pointOfScheduleRepository.findByStationEntity_NameStationAndArrivalTimeAfterOrderByArrivalTimeAsc(endStationName, LocalDateTime.now());
         List<TrainEntity> trains = new ArrayList<>();
         for (PointOfScheduleEntity p : pointsStart) {
             for (PointOfScheduleEntity pe : pointsEnd) {
@@ -105,6 +103,59 @@ public class TrainService {
             }
         }
         return trains.stream().map(TrainFacade::trainToDto).collect(Collectors.toList());
+    }
+
+    public List<TransferDto> findAllStartEndTimePeriodTransfer(String startStationName, String endStationName, LocalDateTime startTimePeriod, LocalDateTime endTimePeriod) {
+        if (startTimePeriod.isBefore(LocalDateTime.now())) {
+            startTimePeriod = LocalDateTime.now();
+        }
+        if (startTimePeriod.isAfter(endTimePeriod)) {
+            endTimePeriod = endTimePeriod.plusMonths(1);
+        }
+        List<PointOfScheduleEntity> pointsStart = pointOfScheduleRepository
+                .findByStationEntity_NameStationAndDepartureTimeAfterAndDepartureTimeBeforeOrderByDepartureTimeAsc(startStationName, startTimePeriod, endTimePeriod);
+        List<PointOfScheduleEntity> pointsEnd = pointOfScheduleRepository.findByStationEntity_NameStationAndArrivalTimeAfterOrderByArrivalTimeAsc(endStationName, LocalDateTime.now());
+
+        List<PointOfScheduleEntity> allPointsFromStart = new ArrayList<>();
+        for (PointOfScheduleEntity point : pointsStart) {
+            allPointsFromStart.addAll(point.getTrainEntity().getPointOfSchedules().stream()
+                    .filter(p -> p.getId() > point.getId())
+                    .filter(p -> !p.getDelayed().equals(EStatus.cancel))
+                    .collect(Collectors.toList()));
+        }
+        List<PointOfScheduleEntity> allPointsToEnd = new ArrayList<>();
+        for (PointOfScheduleEntity point : pointsEnd) {
+            allPointsToEnd.addAll(point.getTrainEntity().getPointOfSchedules().stream()
+                    .filter(p -> p.getId() < point.getId())
+                    .filter(p -> !p.getDelayed().equals(EStatus.cancel))
+                    .collect(Collectors.toList()));
+        }
+        List<Transfer> transfers = new ArrayList<>();
+        for (PointOfScheduleEntity pointSt : allPointsFromStart) {
+            transfers = allPointsToEnd.stream()
+                    .filter(p -> p.getStationEntity().equals(pointSt.getStationEntity()))
+                    .filter(p -> p.getDepartureTime().isAfter(pointSt.getArrivalTime().plusHours(1)))
+                    .map(p -> {
+                        pointSt.getTrainEntity()
+                                .setAmountOfEmptySeats((long) emptySeats(
+                                        pointSt.getTrainEntity(),
+                                        pointSt.getTrainEntity().getPointOfSchedules().stream()
+                                                .filter(pt -> pt.getStationEntity().getNameStation().equals(startStationName))
+                                                .findFirst().get(),
+                                        pointSt).size());
+                        p.getTrainEntity()
+                                .setAmountOfEmptySeats((long) emptySeats(
+                                        p.getTrainEntity(),
+                                        p,
+                                        p.getTrainEntity().getPointOfSchedules().stream()
+                                                .filter(pt-> pt.getStationEntity().getNameStation().equals(endStationName))
+                                                .findFirst().get()).size());
+                        return new Transfer(pointSt.getTrainEntity(), p.getTrainEntity(), pointSt.getStationEntity());
+                    })
+                    .collect(Collectors.toList());
+        }
+
+        return transfers.stream().map(TransferFacade::transferToTransferDto).collect(Collectors.toList());
     }
 
     public List<SeatEntity> emptySeats(TrainEntity train, PointOfScheduleEntity pointStart, PointOfScheduleEntity pointEnd) {
@@ -195,11 +246,11 @@ public class TrainService {
 
     public List<TrainDto> getTrainSchedule(String nameStation) {
         List<PointOfScheduleEntity> points;
-        if (Objects.equals(nameStation, "all")){
+        if (Objects.equals(nameStation, "all")) {
             points = pointOfScheduleRepository
                     .findAllByArrivalTimeAfterOrderByArrivalTime(LocalDateTime.now());
-        }else {
-             points = pointOfScheduleRepository
+        } else {
+            points = pointOfScheduleRepository
                     .findAllByStationEntityNameStationAndArrivalTimeAfterOrderByArrivalTime(nameStation, LocalDateTime.now());
         }
         LOG.info("time now " + LocalDateTime.now());
@@ -225,7 +276,6 @@ public class TrainService {
 
     @Transactional
     public TrainDto rollBackTrain(TrainDto trainDto) {
-        //     trainDto.getPointsOfSchedule().forEach(point -> {
         for (PointOfScheduleDto point : trainDto.getPointsOfSchedule()) {
             PointOfScheduleEntity p = pointOfScheduleRepository.findById(point.getId())
                     .orElseThrow();
@@ -234,7 +284,6 @@ public class TrainService {
             p.setArrivalTime(point.getArrivalTime());
             pointOfScheduleRepository.save(p);
         }
-        //  });
         return TrainFacade.trainToDto(trainEntityRepository.findByTrainNumber(trainDto.getTrainNumber()).get());
     }
 
@@ -245,14 +294,14 @@ public class TrainService {
 
 
         for (int i = 0; i < train.getPointOfSchedules().size(); i++) {
-        if(train.getPointOfSchedules().get(i).getDelayed()!=trainDto.getPointsOfSchedule().get(i).getDelayed()){
-            train.getPointOfSchedules().get(i).setDelayed(trainDto.getPointsOfSchedule().get(i).getDelayed());
-        }
+            if (train.getPointOfSchedules().get(i).getDelayed() != trainDto.getPointsOfSchedule().get(i).getDelayed()) {
+                train.getPointOfSchedules().get(i).setDelayed(trainDto.getPointsOfSchedule().get(i).getDelayed());
+            }
             if (train.getPointOfSchedules().get(i).getDepartureTimeInit().isBefore(trainDto.getPointsOfSchedule().get(i).getDepartureTime())) {
-                if( i<train.getPointOfSchedules().size()-1){
-                    trainDto.getPointsOfSchedule().get(i+1).setArrivalTime(trainDto.getPointsOfSchedule().get(i+1).getArrivalTime()
+                if (i < train.getPointOfSchedules().size() - 1) {
+                    trainDto.getPointsOfSchedule().get(i + 1).setArrivalTime(trainDto.getPointsOfSchedule().get(i + 1).getArrivalTime()
                             .plusSeconds(trainDto.getPointsOfSchedule().get(i).getDepartureTime().toEpochSecond(ZoneOffset.of("+0"))
-                                    -train.getPointOfSchedules().get(i).getDepartureTime().toEpochSecond(ZoneOffset.of("+0"))));
+                                    - train.getPointOfSchedules().get(i).getDepartureTime().toEpochSecond(ZoneOffset.of("+0"))));
                 }
 
                 train.getPointOfSchedules().get(i).setDepartureTime(trainDto.getPointsOfSchedule().get(i).getDepartureTime());
@@ -260,9 +309,9 @@ public class TrainService {
             }
             Long delta = trainDto.getPointsOfSchedule().get(i).getArrivalTime().toEpochSecond(ZoneOffset.of("+0"))
                     - train.getPointOfSchedules().get(i).getArrivalTimeInit().toEpochSecond(ZoneOffset.of("+0"));
-            for(int j=i;j< train.getPointOfSchedules().size(); j++) {
+            for (int j = i; j < train.getPointOfSchedules().size(); j++) {
                 if (delta > 0) {
-                   // train.getPointOfSchedules().get(j).setDelayed(EStatus.running_with_errors);
+                    // train.getPointOfSchedules().get(j).setDelayed(EStatus.running_with_errors);
                     train.getPointOfSchedules().get(j).setArrivalTime(train.getPointOfSchedules().get(j).getArrivalTimeInit().plusSeconds(delta));
                     if ((train.getPointOfSchedules().get(j).getDepartureTime().toEpochSecond(ZoneOffset.of("+0"))
                             - train.getPointOfSchedules().get(j).getArrivalTime().toEpochSecond(ZoneOffset.of("+0"))) < MINIMUM_BOARDING_TIME) {
@@ -270,14 +319,14 @@ public class TrainService {
                                 - train.getPointOfSchedules().get(j).getDepartureTime().toEpochSecond(ZoneOffset.of("+0"));
                         train.getPointOfSchedules().get(j).setDepartureTime(train.getPointOfSchedules().get(j).getArrivalTime().plusSeconds(MINIMUM_BOARDING_TIME));
 
-                    }else {
-                        delta=0L;
-                     //   train.getPointOfSchedules().get(j).setDelayed(EStatus.schedule);
+                    } else {
+                        delta = 0L;
+                        //   train.getPointOfSchedules().get(j).setDelayed(EStatus.schedule);
                     }
                 }
             }
-            train.getPointOfSchedules().forEach(p->{
-                if(p.getArrivalTime().isAfter(p.getArrivalTimeInit())) {
+            train.getPointOfSchedules().forEach(p -> {
+                if (p.getArrivalTime().isAfter(p.getArrivalTimeInit())) {
                     p.setDelayed(EStatus.running_with_errors);
                 }
             });

@@ -6,6 +6,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
@@ -21,10 +22,14 @@ public interface PointOfScheduleRepository extends JpaRepository<PointOfSchedule
     List<PointOfScheduleEntity> findByStationEntity_IdAndDepartureTimeAfter(Long id, LocalDateTime departureTime);
 
 
+
     List<PointOfScheduleEntity> findPointOfScheduleEntityByTrainEntityId(Long id);
+
+    List<PointOfScheduleEntity> findByStationEntity_NameStationAndArrivalTimeAfterOrderByArrivalTimeAsc(String nameStation, LocalDateTime arrivalTime);
+
     List<PointOfScheduleEntity> findAllByStationEntityNameStationOrderByArrivalTimeAsc(String name);
     List<PointOfScheduleEntity> findAllByStationEntityNameStationAndArrivalTimeAfterAndArrivalTimeBeforeOrderByArrivalTimeAsc(String name, LocalDateTime after, LocalDateTime before);
-    Optional<PointOfScheduleEntity> findByTrainEntityAndStationEntityNameStation(TrainEntity train, String nameStation);//todo Optional?
+    Optional<PointOfScheduleEntity> findByTrainEntityAndStationEntityNameStation(TrainEntity train, String nameStation);
     List<PointOfScheduleEntity> findAllByTrainEntityOrderByArrivalTimeAsc(TrainEntity train);
     List<PointOfScheduleEntity> findByTrainEntityTrainNumberAndDepartureTimeBeforeOrderByArrivalTimeAsc(Long trainNumber, LocalDateTime now);
     Optional<PointOfScheduleEntity> findFirstByTrainEntityTrainNumberAndArrivalTimeBeforeOrderByArrivalTimeDesc(Long trainNumber, LocalDateTime now);

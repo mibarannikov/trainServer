@@ -45,4 +45,5 @@ public class TrainEntity extends DateCreateUpdate {
     @Transient
     private Long amountOfEmptySeats;
 
+
 }

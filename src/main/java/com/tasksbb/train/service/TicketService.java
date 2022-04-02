@@ -158,4 +158,6 @@ public class TicketService {
         return String.format(Locale.FRANCE, "%,.2f", price) + "RUB";
     }
 
+
+
 }

@@ -1,7 +1,9 @@
 package com.tasksbb.train.web;
 
 import com.tasksbb.train.dto.TrainDto;
+import com.tasksbb.train.dto.TransferDto;
 import com.tasksbb.train.service.TrainService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -10,6 +12,7 @@ import org.springframework.web.bind.annotation.*;
 import java.time.LocalDateTime;
 import java.util.List;
 
+@RequiredArgsConstructor
 @RestController
 @RequestMapping("api/train")
 @CrossOrigin
@@ -19,9 +22,6 @@ public class TrainController {
 
     private final TrainService trainService;
 
-    public TrainController(TrainService trainService) {
-        this.trainService = trainService;
-    }
 
     @GetMapping("/search")
     public ResponseEntity<List<TrainDto>> trains(@RequestParam(name = "start") String startStationName,
@@ -35,6 +35,17 @@ public class TrainController {
         return new ResponseEntity<>(trains, HttpStatus.OK);
     }
 
+    @GetMapping("/searchtransfer")
+    public ResponseEntity<List<TransferDto>> trainsWithTransfer(@RequestParam(name = "start") String startStationName,
+                                                 @RequestParam(name = "end") String endStationName,
+                                                 @RequestParam(name = "tpstart") String startTimePeriod,
+                                                 @RequestParam(name = "tpend") String endTimePeriod) {
+        LocalDateTime dateTimeStart = LocalDateTime.parse(startTimePeriod);
+       LocalDateTime dateTimeEnd = LocalDateTime.parse(endTimePeriod);
+        List<TransferDto> trains = trainService.findAllStartEndTimePeriodTransfer(startStationName,endStationName,dateTimeStart,dateTimeEnd);
+
+        return new ResponseEntity<>(trains, HttpStatus.OK);
+    }
 
 //    @GetMapping("/freeseats")
 //    public
