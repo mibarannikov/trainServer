@@ -2,17 +2,31 @@ package com.tasksbb.train.service;
 
 import com.tasksbb.train.dto.PointOfScheduleDto;
 import com.tasksbb.train.dto.TicketDto;
-import com.tasksbb.train.entity.*;
+import com.tasksbb.train.entity.PassengerEntity;
+import com.tasksbb.train.entity.PointOfScheduleEntity;
+import com.tasksbb.train.entity.SeatEntity;
+import com.tasksbb.train.entity.TicketEntity;
+import com.tasksbb.train.entity.TrainEntity;
+import com.tasksbb.train.entity.User;
+import com.tasksbb.train.entity.WagonEntity;
 import com.tasksbb.train.ex.ScheduleNotFoundException;
 import com.tasksbb.train.ex.TrainNotFoundException;
 import com.tasksbb.train.facade.TicketFacade;
-import com.tasksbb.train.repository.*;
+import com.tasksbb.train.repository.PassengerEntityRepository;
+import com.tasksbb.train.repository.PointOfScheduleRepository;
+import com.tasksbb.train.repository.SeatEntityRepository;
+import com.tasksbb.train.repository.TicketEntityRepository;
+import com.tasksbb.train.repository.TrainEntityRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Locale;
+import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
@@ -105,7 +119,6 @@ public class TicketService {
         return tickets.stream().map(TicketFacade::ticketToTicketDto).collect(Collectors.toList());
     }
 
-    @Transactional
     public List<TicketDto> ticketsOnTheTrainNow(Long trainNumber) {
         List<PointOfScheduleEntity> points = pointOfScheduleRepository
                 .findByTrainEntityTrainNumberAndDepartureTimeBeforeOrderByArrivalTimeAsc(trainNumber, LocalDateTime.now());
@@ -114,16 +127,6 @@ public class TicketService {
         }
         List<TicketEntity> tickets = ticketEntityRepository
                 .findAllByPointOfSchedules(points.get(points.size() - 1));
-        // tickets =tickets.stream().filter(t -> t.getPointOfSchedules().get(t.getPointOfSchedules().size()-1)!=points.get(points.size()-1)).collect(Collectors.toList());
-
-        //List<SeatEntity> seats = seatEntityRepository.findByTrainEntity(train);
-        //for (SeatEntity st : seats) {
-        //    for (TicketEntity tck : st.getTickets()) {
-        //        if (registeredTicket(tck)) {
-        //            tickets.add(TicketFacade.ticketToTicketDto(tck));
-        //        }
-        //    }
-        //}
         return tickets.stream()
                 .filter(t -> t.getPointOfSchedules().get(t.getPointOfSchedules().size() - 1) != points.get(points.size() - 1))
                 .map(TicketFacade::ticketToTicketDto)
@@ -139,7 +142,7 @@ public class TicketService {
 
             totalDistance += stationService.distanceCalculation(train.getPointOfSchedules().get(i), train.getPointOfSchedules().get(i - 1));
         }
-        Double coeffTypeWagon = 0.0;
+        double coeffTypeWagon = 0.0;
         switch (train.getWagonEntities().stream().filter(wagon -> Objects.equals(wagon.getWagonNumber(), wagonNumber)).findFirst().get().getType()) {
             case "coupe": {
                 coeffTypeWagon = PriceConstants.COUPE_COEFFICIENT;
@@ -154,7 +157,7 @@ public class TicketService {
                 break;
             }
         }
-        double price = totalDistance * PriceConstants.PRICE_PER_KILOMETER * coeffTypeWagon * train.getTrainSpeed() * PriceConstants.SPEED_COEFFICIENT;
+        double price = totalDistance * PriceConstants.PRICE_PER_METER * coeffTypeWagon * train.getTrainSpeed() * PriceConstants.SPEED_COEFFICIENT;
         return String.format(Locale.FRANCE, "%,.2f", price) + "RUB";
     }
 

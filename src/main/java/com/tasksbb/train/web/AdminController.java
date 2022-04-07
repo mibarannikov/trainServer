@@ -2,6 +2,7 @@ package com.tasksbb.train.web;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.google.gson.Gson;
+import com.tasksbb.train.dto.PageDto;
 import com.tasksbb.train.dto.StationDto;
 import com.tasksbb.train.dto.TicketDto;
 import com.tasksbb.train.dto.TrainDto;
@@ -96,8 +97,10 @@ public class AdminController {
     }
 
     @GetMapping("/train/all")
-    public ResponseEntity<List<TrainDto>> getAllTrainsFromPast(@RequestParam(name = "param") String param) {
-        List<TrainDto> trains = trainService.getAllTrains(param);
+    public ResponseEntity<PageDto> getAllTrainsFromPast(@RequestParam(name = "param") String param,
+                                                        @RequestParam(name ="page") int page,
+                                                        @RequestParam(name="amount") int amount) {
+       PageDto trains = trainService.getAllTrains(param, page, amount);
         return new ResponseEntity<>(trains, HttpStatus.OK);
     }
 

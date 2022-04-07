@@ -17,6 +17,9 @@ import com.tasksbb.train.repository.WagonEntityRepository;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -132,7 +135,7 @@ public class TrainService {
         }
         List<Transfer> transfers = new ArrayList<>();
         for (PointOfScheduleEntity pointSt : allPointsFromStart) {
-            transfers = allPointsToEnd.stream()
+            transfers.addAll(allPointsToEnd.stream()
                     .filter(p -> p.getStationEntity().equals(pointSt.getStationEntity()))
                     .filter(p -> p.getDepartureTime().isAfter(pointSt.getArrivalTime().plusHours(1)))
                     .map(p -> {
@@ -148,11 +151,11 @@ public class TrainService {
                                         p.getTrainEntity(),
                                         p,
                                         p.getTrainEntity().getPointOfSchedules().stream()
-                                                .filter(pt-> pt.getStationEntity().getNameStation().equals(endStationName))
+                                                .filter(pt -> pt.getStationEntity().getNameStation().equals(endStationName))
                                                 .findFirst().get()).size());
                         return new Transfer(pointSt.getTrainEntity(), p.getTrainEntity(), pointSt.getStationEntity());
                     })
-                    .collect(Collectors.toList());
+                    .collect(Collectors.toList()));
         }
 
         return transfers.stream().map(TransferFacade::transferToTransferDto).collect(Collectors.toList());
@@ -224,24 +227,27 @@ public class TrainService {
         return emptySeats.stream().map(SeatFacade::seatToSeatDto).collect(Collectors.toList());
     }
 
-    public List<TrainDto> getAllTrains(String param) {
-        List<TrainEntity> trainEntities = new ArrayList<>();
+    public PageDto getAllTrains(String param, int numberPage, int amount) {
+        Pageable page = PageRequest.of(numberPage, amount);
+        Page<TrainEntity> trainEntities = null;
         switch (param) {
             case "act": {
-                trainEntities = trainEntityRepository.findByArrivalTimeEndAfter(LocalDateTime.now());
+                trainEntities = trainEntityRepository.findByArrivalTimeEndAfter(LocalDateTime.now(), page);
                 break;
             }
             case "past": {
-                trainEntities = trainEntityRepository.findByArrivalTimeEndBeforeOrderByDepartureTimeDesc(LocalDateTime.now());
+                trainEntities = trainEntityRepository.findByArrivalTimeEndBeforeOrderByDepartureTimeDesc(LocalDateTime.now(), page);
                 break;
             }
             case "all": {
-                trainEntities = trainEntityRepository.findAllByOrderByDepartureTimeDesc();
+                trainEntities = trainEntityRepository.findAllByOrderByDepartureTimeDesc(page);
                 break;
             }
         }
-
-        return trainEntities.stream().map(TrainFacade::trainToDto).collect(Collectors.toList());
+        PageDto pageDto = new PageDto();
+        pageDto.setContent(trainEntities.getContent().stream().map(TrainFacade::trainToDto).collect(Collectors.toList()));
+        pageDto.setTotalElements(trainEntities.getTotalElements());
+        return pageDto;  //trainEntities.stream().map(TrainFacade::trainToDto).collect(Collectors.toList());
     }
 
     public List<TrainDto> getTrainSchedule(String nameStation) {
@@ -260,7 +266,7 @@ public class TrainService {
     }
 
     public List<TrainDto> getAllActTrains() {
-        return trainEntityRepository.findByArrivalTimeEndAfter(LocalDateTime.now()).stream()
+        return trainEntityRepository.findAll().stream()
                 .map(TrainFacade::trainToDto)
                 .collect(Collectors.toList());
     }

@@ -7,7 +7,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.List;
 
 public interface SeatEntityRepository extends JpaRepository<SeatEntity, Long> {
-    SeatEntity findByTrainEntityAndSeatNumber(TrainEntity train, Long seatNumber);// todo optional?
 
     SeatEntity findByTrainEntityTrainNumberAndSeatNumber(Long trainNumber, Long SeatNumber);// todo optional?
 

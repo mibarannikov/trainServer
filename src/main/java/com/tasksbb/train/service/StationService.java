@@ -106,7 +106,7 @@ public class StationService {
         Set<StationEntity> newCanGet = new LinkedHashSet<>();
         for (String st : stationDto.getCanGetStation()) {
             StationEntity stationEntity = stationEntityRepository.findByNameStation(st)
-                    .orElseThrow(() -> new StationNotFoundException("not found station with id " + stationDto.getId()));
+                    .orElseThrow(() -> new StationNotFoundException("not found station with name " + st));
             newCanGet.add(stationEntity);
         }
         Set<StationEntity> result = new LinkedHashSet<>();
@@ -133,7 +133,6 @@ public class StationService {
         if (!station.getNameStation().equals(stationDto.getNameStation())) {
             station.setNameStation(stationDto.getNameStation());
         }
-
 
         StationDto stationDtoOut = StationFacade.stationToStationDto(stationEntityRepository.save(station));
 
@@ -178,8 +177,6 @@ public class StationService {
 
         pointOfScheduleRepository.saveAll(savePoints);
     }
-
-
 
     private void updatePointOfSchedule(StationEntity station, Double lat, Double lon) {
         List<TrainEntity> trains = trainEntityRepository.findByPointOfSchedules_StationEntity_Id(station.getId());

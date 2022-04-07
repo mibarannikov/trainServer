@@ -34,7 +34,6 @@ class TrainApplicationTests {
 
         });
 
-        pointOfScheduleRepository.saveAll(points);
 
 
     }

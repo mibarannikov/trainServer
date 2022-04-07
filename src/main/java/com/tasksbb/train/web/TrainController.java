@@ -42,9 +42,9 @@ public class TrainController {
                                                  @RequestParam(name = "tpend") String endTimePeriod) {
         LocalDateTime dateTimeStart = LocalDateTime.parse(startTimePeriod);
        LocalDateTime dateTimeEnd = LocalDateTime.parse(endTimePeriod);
-        List<TransferDto> trains = trainService.findAllStartEndTimePeriodTransfer(startStationName,endStationName,dateTimeStart,dateTimeEnd);
+        List<TransferDto> transfers = trainService.findAllStartEndTimePeriodTransfer(startStationName,endStationName,dateTimeStart,dateTimeEnd);
 
-        return new ResponseEntity<>(trains, HttpStatus.OK);
+        return new ResponseEntity<>(transfers, HttpStatus.OK);
     }
 
 //    @GetMapping("/freeseats")

@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 public class StationExistException extends RuntimeException {
     public StationExistException(String msg) {
         super(msg);
+
     }
 
 }

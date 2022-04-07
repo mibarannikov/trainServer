@@ -41,10 +41,6 @@ public class PointOfScheduleEntity  extends DateCreateUpdate{
     @Column(name = "delay",nullable = false)
     private EStatus delayed;
 
-//    @Enumerated(EnumType.STRING)
-//    @Column(name = "status")
-//    private EStatus status;
-
     @ManyToOne(cascade = CascadeType.ALL, optional = false, fetch = FetchType.EAGER)
     @JoinColumn(name = "train_entity_id", nullable = false)
     private TrainEntity trainEntity;
