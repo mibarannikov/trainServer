@@ -1,5 +1,6 @@
 package com.tasksbb.train.service;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.tasksbb.train.dto.*;
 import com.tasksbb.train.entity.*;
 import com.tasksbb.train.entity.enums.EStatus;
@@ -17,6 +18,7 @@ import com.tasksbb.train.repository.WagonEntityRepository;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -44,8 +46,8 @@ public class TrainService {
     private final PointOfScheduleRepository pointOfScheduleRepository;
 
     private final WagonEntityRepository wagonEntityRepository;
-
-
+    @Autowired
+    private ObjectMapper objectMapper;
     @Transactional
     public TrainEntity addTrain(TrainDto trainDto) {
         TrainEntity addTrain = new TrainEntity();

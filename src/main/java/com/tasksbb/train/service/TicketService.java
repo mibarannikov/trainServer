@@ -138,8 +138,8 @@ public class TicketService {
                 .orElseThrow(() -> new TrainNotFoundException("Train with trainNumber " + trainNumber + "not found"));
         double totalDistance = 0.0;
         for (int i = train.getPointOfSchedules().indexOf(pointOfScheduleRepository.findByTrainEntityAndStationEntityNameStation(train, startStation).get()) + 1;
-             i <= train.getPointOfSchedules().indexOf(pointOfScheduleRepository.findByTrainEntityAndStationEntityNameStation(train, endStation).get()); i++) {
-
+             i <= train.getPointOfSchedules().indexOf(pointOfScheduleRepository.findByTrainEntityAndStationEntityNameStation(train, endStation).get()); i++)
+        {
             totalDistance += stationService.distanceCalculation(train.getPointOfSchedules().get(i), train.getPointOfSchedules().get(i - 1));
         }
         double coeffTypeWagon = 0.0;

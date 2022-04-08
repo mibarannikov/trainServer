@@ -5,48 +5,45 @@ import com.tasksbb.train.entity.PointOfScheduleEntity;
 import com.tasksbb.train.entity.StationEntity;
 import com.tasksbb.train.entity.TrainEntity;
 import com.tasksbb.train.entity.enums.EStatus;
-import com.tasksbb.train.ex.StationExistException;
 import com.tasksbb.train.ex.StationNotFoundException;
 import com.tasksbb.train.facade.StationFacade;
 import com.tasksbb.train.repository.PointOfScheduleRepository;
 import com.tasksbb.train.repository.StationEntityRepository;
 import com.tasksbb.train.repository.TrainEntityRepository;
 import com.tasksbb.train.repository.WagonEntityRepository;
-import lombok.RequiredArgsConstructor;
+import lombok.NoArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
-import java.util.ArrayList;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
-@RequiredArgsConstructor
+//@RequiredArgsConstructor
 @Service
+@NoArgsConstructor
 public class StationService {
     public static final Logger LOG = LoggerFactory.getLogger(StationService.class);
 
     private static final Double EARTH_RADIUS = 6372795.0;
-
-    public final StationEntityRepository stationEntityRepository;
-
-    public final PointOfScheduleRepository pointOfScheduleRepository;
-
-    public final TrainEntityRepository trainEntityRepository;
-    public final WagonEntityRepository wagonEntityRepository;
+    @Autowired
+    public StationEntityRepository stationEntityRepository;
+    @Autowired
+    public PointOfScheduleRepository pointOfScheduleRepository;
+    @Autowired
+    public TrainEntityRepository trainEntityRepository;
+    @Autowired
+    public WagonEntityRepository wagonEntityRepository;
 
 
     public List<StationEntity> findAllStation() {
 
         return stationEntityRepository.findByOrderByNameStationAsc();
     }
-
 
 
     public StationEntity addStation(StationDto stationDto) {
@@ -61,18 +58,10 @@ public class StationService {
                         .orElseThrow(() -> new StationNotFoundException("Station with name " + s + " not found")));
             }
             station.getCanGetStations().forEach(st -> st.getCanGetStations().add(station));
-            try {
-                return stationEntityRepository.save(station);
-            } catch (Exception ex) {
-                throw new StationExistException("station with name " + stationDto.getNameStation() + "already exist");// todo переделать
-            }
+            return stationEntityRepository.save(station);
         }
         station.setCanGetStations(new LinkedHashSet<>());
-        try {
-            return stationEntityRepository.save(station);
-        } catch (Exception ex) {
-            throw new StationExistException("station with name " + stationDto.getNameStation() + "already exist");//todo переделать
-        }
+        return stationEntityRepository.save(station);
     }
 
     public StationDto findByNameStation(String name) {
@@ -84,9 +73,9 @@ public class StationService {
     public List<StationDto> findAllSearchStation(String value) {
 
         List<StationEntity> searchStation;
-        if (value.equals("all")){
+        if (value.equals("all")) {
             searchStation = stationEntityRepository.findByOrderByNameStationAsc();
-        } else{
+        } else {
             searchStation = stationEntityRepository.findByNameStationStartsWithOrderByNameStationAsc(value);
         }
 
@@ -192,7 +181,7 @@ public class StationService {
                 }
                 if ((i > 0) && afterFindStation) {
 
-                    double newDistance = distanceCalculation(tr.getPointOfSchedules().get(i),tr.getPointOfSchedules().get(i - 1));
+                    double newDistance = distanceCalculation(tr.getPointOfSchedules().get(i), tr.getPointOfSchedules().get(i - 1));
 
                     long sec = (long) Math.floor((newDistance / (tr.getTrainSpeed() * 0.2777)) - 10);
                     if (tr.getPointOfSchedules().get(i).getArrivalTime().isBefore(tr.getPointOfSchedules().get(i - 1).getDepartureTime().plusSeconds(sec))) {
@@ -211,8 +200,7 @@ public class StationService {
     }
 
 
-
-    public double distanceCalculation(PointOfScheduleEntity point1, PointOfScheduleEntity point2){
+    public double distanceCalculation(PointOfScheduleEntity point1, PointOfScheduleEntity point2) {
         double latRad = point1.getStationEntity().getLatitude() * Math.PI / 180;
         double lonRad = point1.getStationEntity().getLongitude() * Math.PI / 180;
         double latRadPre = point2.getStationEntity().getLatitude() * Math.PI / 180;
