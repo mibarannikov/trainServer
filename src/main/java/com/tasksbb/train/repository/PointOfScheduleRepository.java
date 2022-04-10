@@ -12,18 +12,17 @@ import java.util.Optional;
 @Transactional
 public interface PointOfScheduleRepository extends JpaRepository<PointOfScheduleEntity, Long> {
 
-    List<PointOfScheduleEntity> findByTrainEntity(TrainEntity train);
+    List<PointOfScheduleEntity> findByStationEntity_IdAndDepartureTimeAfter(Long id, LocalDateTime departureTime);
 
-    Optional<PointOfScheduleEntity> findByStationEntityNameStation(String name);
+    List<PointOfScheduleEntity> findByStationEntity_NameStationAndArrivalTimeAfterOrderByArrivalTimeAsc(String nameStation, LocalDateTime arrivalTime);
 
-    List<PointOfScheduleEntity> findPointOfScheduleEntityByTrainEntityId(Long id);
-    List<PointOfScheduleEntity> findAllByStationEntityNameStationOrderByArrivalTimeAsc(String name);
-    List<PointOfScheduleEntity> findAllByStationEntityNameStationAndArrivalTimeAfterAndArrivalTimeBeforeOrderByArrivalTimeAsc(String name, LocalDateTime after, LocalDateTime before);
-    Optional<PointOfScheduleEntity> findByTrainEntityAndStationEntityNameStation(TrainEntity train, String nameStation);//todo Optional?
-    List<PointOfScheduleEntity> findAllByTrainEntityOrderByArrivalTimeAsc(TrainEntity train);
+    Optional<PointOfScheduleEntity> findByTrainEntityAndStationEntityNameStation(TrainEntity train, String nameStation);
+
     List<PointOfScheduleEntity> findByTrainEntityTrainNumberAndDepartureTimeBeforeOrderByArrivalTimeAsc(Long trainNumber, LocalDateTime now);
-    Optional<PointOfScheduleEntity> findFirstByTrainEntityTrainNumberAndArrivalTimeBeforeOrderByArrivalTimeDesc(Long trainNumber, LocalDateTime now);
+
     List<PointOfScheduleEntity> findAllByStationEntityNameStationAndArrivalTimeAfterOrderByArrivalTime(String nameStation, LocalDateTime now);
+
+    List<PointOfScheduleEntity> findAllByArrivalTimeAfterOrderByArrivalTime(LocalDateTime now);
 
     List<PointOfScheduleEntity> findByStationEntity_NameStationAndDepartureTimeAfterAndDepartureTimeBeforeOrderByDepartureTimeAsc(String nameStation, LocalDateTime departureTime, LocalDateTime departureTime1);
 

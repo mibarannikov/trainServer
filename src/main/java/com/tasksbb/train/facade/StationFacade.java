@@ -2,8 +2,6 @@ package com.tasksbb.train.facade;
 
 import com.tasksbb.train.dto.StationDto;
 import com.tasksbb.train.entity.StationEntity;
-import org.springframework.stereotype.Component;
-
 
 
 public class StationFacade {

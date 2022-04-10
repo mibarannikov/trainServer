@@ -1,0 +1,38 @@
+{
+  "id": 37,
+  "wagonNumber": 1,
+  "seatNumber": 1,
+  "firstnamePassenger": "Иван",
+  "lastnamePassenger": "Иванов",
+  "dateOfBirth": "2022-04-01",
+  "numberTrainOwner": 12320220409,
+  "nameStations": [
+    {
+      "id": 230,
+      "nameStation": "Воронеж",
+      "arrivalTime": "2022-04-10T03:17:33",
+      "arrivalTimeInit": "2022-04-10T03:17:33",
+      "departureTime": "2022-04-10T03:22:33",
+      "departureTimeInit": "2022-04-10T03:22:33",
+      "delayed": "schedule"
+    },
+    {
+      "id": 231,
+      "nameStation": "Москва",
+      "arrivalTime": "2022-04-10T14:47:15",
+      "arrivalTimeInit": "2022-04-10T14:47:15",
+      "departureTime": "2022-04-10T14:52:15",
+      "departureTimeInit": "2022-04-10T14:52:15",
+      "delayed": "schedule"
+    },
+    {
+      "id": 232,
+      "nameStation": "Нижний Новгород",
+      "arrivalTime": "2022-04-11T00:56:23",
+      "arrivalTimeInit": "2022-04-11T00:56:23",
+      "departureTime": "2022-04-11T01:01:23",
+      "departureTimeInit": "2022-04-11T01:01:23",
+      "delayed": "schedule"
+    }
+  ]
+}

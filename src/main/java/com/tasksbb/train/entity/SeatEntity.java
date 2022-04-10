@@ -1,12 +1,9 @@
 package com.tasksbb.train.entity;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
-import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
 
 import javax.persistence.*;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -14,7 +11,7 @@ import java.util.List;
 @Table(name = "seat_entity")
 @Getter
 @Setter
-public class SeatEntity extends DateCreateUpdate{
+public class SeatEntity extends DateCreateUpdate {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false)
@@ -23,14 +20,12 @@ public class SeatEntity extends DateCreateUpdate{
     @Column(name = "seat_number", nullable = false)
     private Long seatNumber;
 
-    @ManyToOne(cascade = CascadeType.ALL,fetch = FetchType.EAGER)
+    @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @JoinColumn(name = "train_entity_id")
     private TrainEntity trainEntity;
 
     @OneToMany(mappedBy = "seatEntity", orphanRemoval = true, fetch = FetchType.EAGER)
     private List<TicketEntity> tickets = new ArrayList<>();
-
-
 
 
 }

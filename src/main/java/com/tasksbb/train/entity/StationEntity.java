@@ -1,13 +1,11 @@
 package com.tasksbb.train.entity;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.persistence.*;
-import java.time.LocalDateTime;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
@@ -35,13 +33,12 @@ public class StationEntity extends DateCreateUpdate {
     @Column(name = "longitude", nullable = false)
     private Double longitude;
 
+
     @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JoinTable(name = "station_entity_can_get_station",
             joinColumns = @JoinColumn(name = "station_entity_1_id"),
             inverseJoinColumns = @JoinColumn(name = "station_entities_2_id"))
     private Set<StationEntity> canGetStations = new LinkedHashSet<>();
-
-
 
 
 }

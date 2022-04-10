@@ -6,6 +6,7 @@ import com.tasksbb.train.entity.enums.ERole;
 import com.tasksbb.train.ex.UserExistException;
 import com.tasksbb.train.payload.request.SignupRequest;
 import com.tasksbb.train.repository.UserRepository;
+import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -15,6 +16,7 @@ import org.springframework.stereotype.Service;
 import java.security.Principal;
 
 @Service
+@RequiredArgsConstructor
 public class UserService {
     public static final Logger LOG = LoggerFactory.getLogger(UserService.class);
 
@@ -22,10 +24,10 @@ public class UserService {
     private final BCryptPasswordEncoder passwordEncoder;
 
 
-    public UserService(UserRepository userRepository, BCryptPasswordEncoder passwordEncoder) {
-        this.userRepository = userRepository;
-        this.passwordEncoder = passwordEncoder;
-    }
+//    public UserService(UserRepository userRepository, BCryptPasswordEncoder passwordEncoder) {
+//        this.userRepository = userRepository;
+//        this.passwordEncoder = passwordEncoder;
+//    }
 
 
     public User createUser(SignupRequest userIn) {

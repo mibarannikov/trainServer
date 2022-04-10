@@ -10,7 +10,7 @@ import java.util.Set;
 
 @Getter
 @Setter
-public class UserDTO {
+public class UserDto {
 
     private Long id;
     @NotEmpty

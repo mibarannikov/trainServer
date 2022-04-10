@@ -3,7 +3,6 @@ package com.tasksbb.train.security;
 import com.tasksbb.train.entity.User;
 import com.tasksbb.train.ex.MyExpiredJwtException;
 import io.jsonwebtoken.*;
-import lombok.Data;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.core.Authentication;
@@ -53,7 +52,7 @@ public class JwtTokenProvider {
         }
     }
 
-    public Long getUserIdFromToken(String token){
+    public Long getUserIdFromToken(String token) {
         Claims claims = Jwts.parser().setSigningKey(SecurityConstans.SECRET)
                 .parseClaimsJws(token)
                 .getBody();

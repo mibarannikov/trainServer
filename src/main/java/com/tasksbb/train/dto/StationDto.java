@@ -10,12 +10,12 @@ import java.util.List;
 @Getter
 @Setter
 public class StationDto {
-    public Long id;
+    private Long id;
     @NotEmpty
-    public String nameStation;
+    private String nameStation;
     @NotEmpty
-    public Double latitude;
+    private Double latitude;
     @NotEmpty
-    public Double longitude;
-    public List<String> canGetStation = new ArrayList<>();
+    private Double longitude;
+    private List<String> canGetStation = new ArrayList<>();
 }
