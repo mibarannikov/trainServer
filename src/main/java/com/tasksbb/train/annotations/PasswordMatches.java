@@ -2,7 +2,6 @@ package com.tasksbb.train.annotations;
 
 import com.tasksbb.train.validations.PasswordMatchesValidator;
 
-
 import javax.validation.Constraint;
 import javax.validation.Payload;
 import java.lang.annotation.*;
@@ -14,7 +13,7 @@ import java.lang.annotation.*;
 public @interface PasswordMatches {
     String message() default "Password do not match";
 
-    Class<?>[] groups() default{};
+    Class<?>[] groups() default {};
 
     Class<? extends Payload>[] payload() default {};
 }

@@ -46,8 +46,8 @@ public class TrainService {
     private final PointOfScheduleRepository pointOfScheduleRepository;
 
     private final WagonEntityRepository wagonEntityRepository;
-    @Autowired
-    private ObjectMapper objectMapper;
+
+
     @Transactional
     public TrainEntity addTrain(TrainDto trainDto) {
         TrainEntity addTrain = new TrainEntity();
@@ -286,7 +286,7 @@ public class TrainService {
     public TrainDto rollBackTrain(TrainDto trainDto) {
         for (PointOfScheduleDto point : trainDto.getPointsOfSchedule()) {
             PointOfScheduleEntity p = pointOfScheduleRepository.findById(point.getId())
-                    .orElseThrow();
+                    .orElseThrow(() -> new ScheduleNotFoundException("Point with id " + point.getId() + "not found"));
             p.setDelayed(point.getDelayed());
             p.setDepartureTime(point.getDepartureTime());
             p.setArrivalTime(point.getArrivalTime());
@@ -298,7 +298,7 @@ public class TrainService {
     @Transactional
     public TrainDto updateTrain(TrainDto trainDto) {
         TrainEntity train = trainEntityRepository.findByTrainNumber(trainDto.getTrainNumber())
-                .orElseThrow(() -> new TrainNotFoundException("Train with trainNumber " + trainDto.getTrainNumber() + "not found"));
+                .orElseThrow(() -> new TrainNotFoundException("Train with trainNumber " + trainDto.getTrainNumber() + " not found"));
 
 
         for (int i = 0; i < train.getPointOfSchedules().size(); i++) {

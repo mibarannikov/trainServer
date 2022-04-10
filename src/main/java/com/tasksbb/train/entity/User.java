@@ -2,14 +2,15 @@ package com.tasksbb.train.entity;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.tasksbb.train.entity.enums.ERole;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.Setter;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
 import java.util.*;
-
 
 
 @Getter
@@ -45,6 +46,7 @@ public class User implements UserDetails {
         this.createDate = LocalDateTime.now();
 
     }
+
     @Transient
     private Collection<? extends GrantedAuthority> authorities;
 

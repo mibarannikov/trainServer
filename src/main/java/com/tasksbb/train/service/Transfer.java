@@ -5,8 +5,6 @@ import com.tasksbb.train.entity.TrainEntity;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.time.LocalDateTime;
-
 @Getter
 @Setter
 public class Transfer {

@@ -33,7 +33,7 @@ public class TrainEntity extends DateCreateUpdate {
     @Column(name = "train_speed", nullable = false)
     private Double trainSpeed;
 
-    @OneToMany(mappedBy = "trainEntity",  orphanRemoval = true,fetch = FetchType.LAZY,cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "trainEntity", orphanRemoval = true, fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private List<PointOfScheduleEntity> pointOfSchedules = new ArrayList<>();
 
     @OneToMany(mappedBy = "trainEntity", orphanRemoval = true, cascade = CascadeType.ALL)

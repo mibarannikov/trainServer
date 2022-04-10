@@ -1,7 +1,5 @@
 package com.tasksbb.train.validations;
 
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 import org.springframework.validation.BindingResult;
@@ -26,11 +24,11 @@ public class ResponseErrorValidation {
             for (FieldError error : result.getFieldErrors()) {
                 errorMap.put(error.getField(), error.getDefaultMessage());
             }
-           //
+            //
             throw new ValidationException(errorMap);
             // return new ResponseEntity<>(errorMap, HttpStatus.BAD_REQUEST);
         }
-       // return null;
+        // return null;
     }
 
 }

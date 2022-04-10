@@ -23,7 +23,7 @@ public class WagonController {
     private final TrainService trainService;
 
     @GetMapping("/all")
-    public ResponseEntity<List<WagonDto>> getAllWagon(){
+    public ResponseEntity<List<WagonDto>> getAllWagon() {
 
         return new ResponseEntity<>(trainService.findAllWagon(), HttpStatus.OK);
 

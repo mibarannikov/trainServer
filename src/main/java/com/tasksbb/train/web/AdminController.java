@@ -98,9 +98,9 @@ public class AdminController {
 
     @GetMapping("/train/all")
     public ResponseEntity<PageDto> getAllTrainsFromPast(@RequestParam(name = "param") String param,
-                                                        @RequestParam(name ="page") int page,
-                                                        @RequestParam(name="amount") int amount) {
-       PageDto trains = trainService.getAllTrains(param, page, amount);
+                                                        @RequestParam(name = "page") int page,
+                                                        @RequestParam(name = "amount") int amount) {
+        PageDto trains = trainService.getAllTrains(param, page, amount);
         return new ResponseEntity<>(trains, HttpStatus.OK);
     }
 

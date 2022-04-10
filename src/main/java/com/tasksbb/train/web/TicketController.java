@@ -16,7 +16,6 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
-import java.util.ArrayList;
 import java.util.List;
 
 
@@ -51,7 +50,7 @@ public class TicketController {
     ResponseEntity<List<SeatDto>> emptySeats(@RequestParam(name = "train") Long trainNumber,
                                              @RequestParam(name = "wagon") Long wagonNumber,
                                              @RequestParam(name = "start") String startStation,
-                                             @RequestParam(name = "end") String endStation) {
+                                             @RequestParam(name = "end"  ) String endStation) {
         List<SeatDto> seats = trainService.getEmptySeats(trainNumber, startStation, endStation, wagonNumber);
         return new ResponseEntity<>(seats, HttpStatus.OK);
 
@@ -63,8 +62,8 @@ public class TicketController {
                                          @RequestParam(name = "start") String startStation,
                                          @RequestParam(name = "end") String endStation) {
         String price = ticketService.priceCalculation(trainNumber, wagonNumber, startStation, endStation);
-       PriceDto pr = new PriceDto();
-       pr.setPrice(price);
+        PriceDto pr = new PriceDto();
+        pr.setPrice(price);
         return new ResponseEntity<>(pr, HttpStatus.OK);
     }
 

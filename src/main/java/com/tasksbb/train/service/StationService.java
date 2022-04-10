@@ -11,10 +11,9 @@ import com.tasksbb.train.repository.PointOfScheduleRepository;
 import com.tasksbb.train.repository.StationEntityRepository;
 import com.tasksbb.train.repository.TrainEntityRepository;
 import com.tasksbb.train.repository.WagonEntityRepository;
-import lombok.NoArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -25,19 +24,19 @@ import java.util.stream.Collectors;
 
 //@RequiredArgsConstructor
 @Service
-@NoArgsConstructor
+@RequiredArgsConstructor
 public class StationService {
     public static final Logger LOG = LoggerFactory.getLogger(StationService.class);
 
     private static final Double EARTH_RADIUS = 6372795.0;
-    @Autowired
-    public StationEntityRepository stationEntityRepository;
-    @Autowired
-    public PointOfScheduleRepository pointOfScheduleRepository;
-    @Autowired
-    public TrainEntityRepository trainEntityRepository;
-    @Autowired
-    public WagonEntityRepository wagonEntityRepository;
+
+    public final StationEntityRepository stationEntityRepository;
+
+    public final PointOfScheduleRepository pointOfScheduleRepository;
+
+    public final TrainEntityRepository trainEntityRepository;
+
+    public final WagonEntityRepository wagonEntityRepository;
 
 
     public List<StationEntity> findAllStation() {
@@ -47,7 +46,6 @@ public class StationService {
 
 
     public StationEntity addStation(StationDto stationDto) {
-
         StationEntity station = new StationEntity();
         station.setNameStation(stationDto.getNameStation());
         station.setLatitude(stationDto.getLatitude());
@@ -71,7 +69,6 @@ public class StationService {
     }
 
     public List<StationDto> findAllSearchStation(String value) {
-
         List<StationEntity> searchStation;
         if (value.equals("all")) {
             searchStation = stationEntityRepository.findByOrderByNameStationAsc();
@@ -88,7 +85,6 @@ public class StationService {
     public StationDto editStation(StationDto stationDto) {
         StationEntity station = stationEntityRepository.findById(stationDto.getId())
                 .orElseThrow(() -> new StationNotFoundException("not found station with id " + stationDto.getId()));
-
         if ((!Objects.equals(station.getLatitude(), stationDto.getLatitude())) || (!Objects.equals(station.getLongitude(), stationDto.getLongitude()))) {
             updatePointOfSchedule(station, stationDto.getLatitude(), stationDto.getLongitude());
         }

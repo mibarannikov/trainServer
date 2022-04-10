@@ -30,34 +30,21 @@ public class TrainController {
                                                  @RequestParam(name = "tpend") String endTimePeriod) {
         LocalDateTime dateTimeStart = LocalDateTime.parse(startTimePeriod);
         LocalDateTime dateTimeEnd = LocalDateTime.parse(endTimePeriod);
-        List<TrainDto> trains = trainService.findAllStartEndTimePeriod(startStationName,endStationName,dateTimeStart,dateTimeEnd);
+        List<TrainDto> trains = trainService.findAllStartEndTimePeriod(startStationName, endStationName, dateTimeStart, dateTimeEnd);
 
         return new ResponseEntity<>(trains, HttpStatus.OK);
     }
 
     @GetMapping("/searchtransfer")
     public ResponseEntity<List<TransferDto>> trainsWithTransfer(@RequestParam(name = "start") String startStationName,
-                                                 @RequestParam(name = "end") String endStationName,
-                                                 @RequestParam(name = "tpstart") String startTimePeriod,
-                                                 @RequestParam(name = "tpend") String endTimePeriod) {
+                                                                @RequestParam(name = "end") String endStationName,
+                                                                @RequestParam(name = "tpstart") String startTimePeriod,
+                                                                @RequestParam(name = "tpend") String endTimePeriod) {
         LocalDateTime dateTimeStart = LocalDateTime.parse(startTimePeriod);
-       LocalDateTime dateTimeEnd = LocalDateTime.parse(endTimePeriod);
-        List<TransferDto> transfers = trainService.findAllStartEndTimePeriodTransfer(startStationName,endStationName,dateTimeStart,dateTimeEnd);
+        LocalDateTime dateTimeEnd = LocalDateTime.parse(endTimePeriod);
+        List<TransferDto> transfers = trainService.findAllStartEndTimePeriodTransfer(startStationName, endStationName, dateTimeStart, dateTimeEnd);
 
         return new ResponseEntity<>(transfers, HttpStatus.OK);
     }
-
-//    @GetMapping("/freeseats")
-//    public
-//    ResponseEntity<List<SeatEntityDto>> getFreeSeats(@RequestParam(name = "train") Long trainNumber,
-//                                                     @RequestParam(name = "start") String startStation,
-//                                                     @RequestParam(name = "end") String endStation){
-//        List<SeatEntityDto> seats = new ArrayList<>();
-//      //  seats = trainService.findAllFreeSeats(trainNumber,startStation,endStation);
-//        return new ResponseEntity<>(seats, HttpStatus.OK);
-//    }
-
-
-
 
 }

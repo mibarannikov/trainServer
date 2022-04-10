@@ -2,31 +2,18 @@ package com.tasksbb.train.service;
 
 import com.tasksbb.train.dto.PointOfScheduleDto;
 import com.tasksbb.train.dto.TicketDto;
-import com.tasksbb.train.entity.PassengerEntity;
-import com.tasksbb.train.entity.PointOfScheduleEntity;
-import com.tasksbb.train.entity.SeatEntity;
-import com.tasksbb.train.entity.TicketEntity;
-import com.tasksbb.train.entity.TrainEntity;
-import com.tasksbb.train.entity.User;
-import com.tasksbb.train.entity.WagonEntity;
+import com.tasksbb.train.entity.*;
 import com.tasksbb.train.ex.ScheduleNotFoundException;
+import com.tasksbb.train.ex.SeatNotFoundException;
 import com.tasksbb.train.ex.TrainNotFoundException;
 import com.tasksbb.train.facade.TicketFacade;
-import com.tasksbb.train.repository.PassengerEntityRepository;
-import com.tasksbb.train.repository.PointOfScheduleRepository;
-import com.tasksbb.train.repository.SeatEntityRepository;
-import com.tasksbb.train.repository.TicketEntityRepository;
-import com.tasksbb.train.repository.TrainEntityRepository;
+import com.tasksbb.train.repository.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Locale;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
@@ -66,12 +53,19 @@ public class TicketService {
         amountSeats += ticketDto.getSeatNumber();
 
         SeatEntity seat = seatEntityRepository
-                .findByTrainEntityTrainNumberAndSeatNumber(ticketDto.getNumberTrainOwner(), amountSeats);// todo orElseThrow()
+                .findByTrainEntityTrainNumberAndSeatNumber(ticketDto.getNumberTrainOwner(), amountSeats)
+                .orElseThrow(() -> new SeatNotFoundException("seat not found"));
 
         for (PointOfScheduleDto name : ticketDto.getNameStations()) {
             newTicket.getPointOfSchedules()
                     .add(pointOfScheduleRepository.findByTrainEntityAndStationEntityNameStation(seat.getTrainEntity(), name.getNameStation())
-                            .orElseThrow(() -> new ScheduleNotFoundException("Not found point of schedule for train number" + seat.getTrainEntity().getTrainNumber() + " and station " + name.getNameStation())));// todo orElseThrow()
+                            .orElseThrow(() ->
+                                    new ScheduleNotFoundException(
+                                            "Not found point of schedule for train number"
+                                                    + seat.getTrainEntity().getTrainNumber()
+                                                    + " and station "
+                                                    + name.getNameStation()
+                                    )));
         }
         Optional<PassengerEntity> passenger = passengerEntityRepository
                 .findByFirstnameAndLastnameAndDateOfBirth(
@@ -138,8 +132,7 @@ public class TicketService {
                 .orElseThrow(() -> new TrainNotFoundException("Train with trainNumber " + trainNumber + "not found"));
         double totalDistance = 0.0;
         for (int i = train.getPointOfSchedules().indexOf(pointOfScheduleRepository.findByTrainEntityAndStationEntityNameStation(train, startStation).get()) + 1;
-             i <= train.getPointOfSchedules().indexOf(pointOfScheduleRepository.findByTrainEntityAndStationEntityNameStation(train, endStation).get()); i++)
-        {
+             i <= train.getPointOfSchedules().indexOf(pointOfScheduleRepository.findByTrainEntityAndStationEntityNameStation(train, endStation).get()); i++) {
             totalDistance += stationService.distanceCalculation(train.getPointOfSchedules().get(i), train.getPointOfSchedules().get(i - 1));
         }
         double coeffTypeWagon = 0.0;
@@ -160,7 +153,6 @@ public class TicketService {
         double price = totalDistance * PriceConstants.PRICE_PER_METER * coeffTypeWagon * train.getTrainSpeed() * PriceConstants.SPEED_COEFFICIENT;
         return String.format(Locale.FRANCE, "%,.2f", price) + "RUB";
     }
-
 
 
 }

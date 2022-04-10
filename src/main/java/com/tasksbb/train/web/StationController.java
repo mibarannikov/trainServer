@@ -1,6 +1,5 @@
 package com.tasksbb.train.web;
 
-import com.tasksbb.train.dto.PointOfScheduleDto;
 import com.tasksbb.train.dto.StationDto;
 import com.tasksbb.train.dto.TrainDto;
 import com.tasksbb.train.facade.StationFacade;
@@ -33,7 +32,7 @@ public class StationController {
     }
 
     @GetMapping("/search")
-    public ResponseEntity<List<StationDto>> getAllSearchStations(@RequestParam(name= "value") String value) {
+    public ResponseEntity<List<StationDto>> getAllSearchStations(@RequestParam(name = "value") String value) {
         List<StationDto> stationsDto = stationService.findAllSearchStation(value);
         return new ResponseEntity<>(stationsDto, HttpStatus.OK);
     }
@@ -44,11 +43,12 @@ public class StationController {
 
         return new ResponseEntity<>(stationDto, HttpStatus.OK);
     }
+
     @GetMapping("/stationschedule")
-    public ResponseEntity<List<TrainDto>> stationSchedule(@RequestParam(name="station") String nameStation){
+    public ResponseEntity<List<TrainDto>> stationSchedule(@RequestParam(name = "station") String nameStation) {
 
         List<TrainDto> trains = trainService.getTrainSchedule(nameStation);
 
-        return new ResponseEntity<>(trains,HttpStatus.OK);
+        return new ResponseEntity<>(trains, HttpStatus.OK);
     }
 }

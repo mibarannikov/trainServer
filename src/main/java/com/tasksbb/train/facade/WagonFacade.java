@@ -4,7 +4,7 @@ import com.tasksbb.train.dto.WagonDto;
 import com.tasksbb.train.entity.WagonEntity;
 
 public class WagonFacade {
-    public static WagonDto wagonToWagonDto(WagonEntity wagon){
+    public static WagonDto wagonToWagonDto(WagonEntity wagon) {
         WagonDto wagonDto = new WagonDto();
         wagonDto.setId(wagon.getId());
         wagonDto.setWagonNumber(wagon.getWagonNumber());

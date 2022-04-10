@@ -1,11 +1,9 @@
 package com.tasksbb.train.entity;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Getter;
 import lombok.Setter;
 
 import javax.persistence.*;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -23,7 +21,7 @@ public class TicketEntity extends DateCreateUpdate {
     @JoinColumn(name = "seat_entity_id")
     private SeatEntity seatEntity;
 
-    @ManyToOne(cascade = CascadeType.ALL,fetch = FetchType.EAGER)
+    @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @JoinColumn(name = "passenger_entity_id")
     private PassengerEntity passengerEntity;
 

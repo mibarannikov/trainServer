@@ -27,6 +27,6 @@ public class TrainDto implements Serializable {
     @NotEmpty
     private List<PointOfScheduleDto> pointsOfSchedule = new ArrayList<>();
     @NotEmpty
-    private  List<WagonDto> wagons = new ArrayList<>();
+    private List<WagonDto> wagons = new ArrayList<>();
 }
 

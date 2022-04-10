@@ -12,7 +12,7 @@ import java.time.LocalDateTime;
 @Table(name = "point_of_schedule_entity")
 @Getter
 @Setter
-public class PointOfScheduleEntity  extends DateCreateUpdate{
+public class PointOfScheduleEntity extends DateCreateUpdate {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false)
@@ -38,7 +38,7 @@ public class PointOfScheduleEntity  extends DateCreateUpdate{
     private LocalDateTime departureTimeInit;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "delay",nullable = false)
+    @Column(name = "delay", nullable = false)
     private EStatus delayed;
 
     @ManyToOne(cascade = CascadeType.ALL, optional = false, fetch = FetchType.EAGER)
@@ -51,10 +51,8 @@ public class PointOfScheduleEntity  extends DateCreateUpdate{
         super.onCreate();
         this.arrivalTimeInit = this.arrivalTime;
         this.departureTimeInit = this.departureTime;
-        this.delayed=EStatus.schedule;
+        this.delayed = EStatus.schedule;
     }
-
-
 
 
 }
