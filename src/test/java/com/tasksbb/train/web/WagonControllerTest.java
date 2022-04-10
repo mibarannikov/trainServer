@@ -22,6 +22,8 @@ class WagonControllerTest {
     @Autowired
     private MockMvc mockMvc;
 
+
+
     @Test
     void getAllWagon() throws Exception {
         mockMvc.perform(get("/api/wagon/all"))
