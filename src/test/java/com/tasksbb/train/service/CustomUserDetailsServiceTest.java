@@ -34,7 +34,7 @@ class CustomUserDetailsServiceTest {
     @Test
     void loadUserById() {
         when(userRepository.findUserById(anyLong())).thenReturn(Optional.of(new User()));
-        customUserDetailsService.loadUserByUsername("test");
+        customUserDetailsService.loadUserById(1L);
         verify(userRepository,times(1)).findUserById(anyLong());
     }
 

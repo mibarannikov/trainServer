@@ -1,6 +1,7 @@
 package com.tasksbb.train.web;
 
 import org.apache.activemq.junit.EmbeddedActiveMQBroker;
+import org.junit.Rule;
 import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,7 +18,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @RunWith(SpringRunner.class)
 @AutoConfigureMockMvc(addFilters = false)
 class WagonControllerTest {
-    public EmbeddedActiveMQBroker broker = new EmbeddedActiveMQBroker();
+
+  @Rule
+  public EmbeddedActiveMQBroker broker = new EmbeddedActiveMQBroker();
 
     @Autowired
     private MockMvc mockMvc;

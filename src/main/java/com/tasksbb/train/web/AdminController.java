@@ -17,11 +17,19 @@ import com.tasksbb.train.validations.ResponseErrorValidation;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.jms.core.JmsTemplate;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
@@ -31,16 +39,17 @@ import java.util.List;
 @CrossOrigin
 public class AdminController {
 
-    public static final Logger LOG = LoggerFactory.getLogger(AdminController.class);
-    public final StationService stationService;
+    private static final Logger LOG = LoggerFactory.getLogger(AdminController.class);
 
-    public final ResponseErrorValidation responseErrorValidation;
+    private final StationService stationService;
+
+    private final ResponseErrorValidation responseErrorValidation;
 
     private final JmsTemplate jmsTemplate;
 
-    public final TrainService trainService;
+    private final TrainService trainService;
 
-    public final TicketService ticketService;
+    private final TicketService ticketService;
 
 
     @PostMapping("/station/add")
@@ -51,6 +60,7 @@ public class AdminController {
 //            return errors;
 //        }
         StationEntity station = stationService.addStation(stationDto);
+        jmsTemplate.convertAndSend("one", "update");
         return new ResponseEntity<>(StationFacade.stationToStationDto(station), HttpStatus.OK);
     }
 
@@ -62,7 +72,7 @@ public class AdminController {
 //            return errors;
 //        }
         StationDto station = stationService.editStation(stationDto);
-        jmsTemplate.convertAndSend("one", "update");
+       jmsTemplate.convertAndSend("one", "update");
         return new ResponseEntity<>(station, HttpStatus.OK);
     }
 
@@ -78,7 +88,7 @@ public class AdminController {
 
     @PutMapping("/train/update")
     public ResponseEntity<TrainDto> updateTrain(@RequestBody TrainDto trainDto, BindingResult bindingResult) {
-        TrainDto train = trainService.updateTrain(trainDto);
+        TrainDto train = TrainFacade.trainToDto(trainService.updateTrain(trainDto));
         jmsTemplate.convertAndSend("one", "update");
         return new ResponseEntity<>(train, HttpStatus.OK);
     }

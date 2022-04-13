@@ -1,11 +1,11 @@
 package com.tasksbb.train.service;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.tasksbb.train.dto.*;
 import com.tasksbb.train.entity.*;
 import com.tasksbb.train.entity.enums.EStatus;
 import com.tasksbb.train.ex.ScheduleNotFoundException;
 import com.tasksbb.train.ex.StationNotFoundException;
+import com.tasksbb.train.ex.TrainExistException;
 import com.tasksbb.train.ex.TrainNotFoundException;
 import com.tasksbb.train.facade.SeatFacade;
 import com.tasksbb.train.facade.TrainFacade;
@@ -15,10 +15,10 @@ import com.tasksbb.train.repository.PointOfScheduleRepository;
 import com.tasksbb.train.repository.StationEntityRepository;
 import com.tasksbb.train.repository.TrainEntityRepository;
 import com.tasksbb.train.repository.WagonEntityRepository;
+import com.tasksbb.train.service.transfer.Transfer;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -55,7 +55,11 @@ public class TrainService {
         addTrain.setTrainSpeed(trainDto.getTrainSpeed());
         addTrain.setDepartureTime(trainDto.getDepartureTime());
         addTrain.setArrivalTimeEnd(trainDto.getArrivalTimeEnd());
-        addTrain = trainEntityRepository.save(addTrain);
+        try {
+            addTrain = trainEntityRepository.save(addTrain);
+        } catch (Exception ex) {
+            throw new TrainExistException("train with number " + trainDto.getTrainNumber() + " already exist");
+        }
         for (WagonDto w : trainDto.getWagons()) {
             WagonEntity wagon = new WagonEntity();
             wagon.setWagonNumber(w.getWagonNumber());
@@ -141,20 +145,16 @@ public class TrainService {
                     .filter(p -> p.getStationEntity().equals(pointSt.getStationEntity()))
                     .filter(p -> p.getDepartureTime().isAfter(pointSt.getArrivalTime().plusHours(1)))
                     .map(p -> {
-                        pointSt.getTrainEntity()
-                                .setAmountOfEmptySeats((long) emptySeats(
-                                        pointSt.getTrainEntity(),
-                                        pointSt.getTrainEntity().getPointOfSchedules().stream()
-                                                .filter(pt -> pt.getStationEntity().getNameStation().equals(startStationName))
-                                                .findFirst().get(),
-                                        pointSt).size());
-                        p.getTrainEntity()
-                                .setAmountOfEmptySeats((long) emptySeats(
-                                        p.getTrainEntity(),
-                                        p,
-                                        p.getTrainEntity().getPointOfSchedules().stream()
-                                                .filter(pt -> pt.getStationEntity().getNameStation().equals(endStationName))
-                                                .findFirst().get()).size());
+                        pointSt.getTrainEntity().setAmountOfEmptySeats((long) emptySeats(
+                                pointSt.getTrainEntity(),
+                                pointSt.getTrainEntity().getPointOfSchedules().stream()
+                                        .filter(pt -> pt.getStationEntity().getNameStation().equals(startStationName))
+                                        .findFirst().get(),
+                                pointSt).size());
+                        p.getTrainEntity().setAmountOfEmptySeats((long) emptySeats(p.getTrainEntity(), p,
+                                p.getTrainEntity().getPointOfSchedules().stream()
+                                        .filter(pt -> pt.getStationEntity().getNameStation().equals(endStationName))
+                                        .findFirst().get()).size());
                         return new Transfer(pointSt.getTrainEntity(), p.getTrainEntity(), pointSt.getStationEntity());
                     })
                     .collect(Collectors.toList()));
@@ -189,7 +189,7 @@ public class TrainService {
     }
 
 
-    public List<SeatEntity> emptySeats(TrainEntity train, PointOfScheduleEntity pointStart, PointOfScheduleEntity pointEnd, Long wagonNumber) {
+    private List<SeatEntity> emptySeats(TrainEntity train, PointOfScheduleEntity pointStart, PointOfScheduleEntity pointEnd, Long wagonNumber) {
         int lastSeat = 0;
         for (int i = 0; i < wagonNumber - 1; i++) {
             lastSeat += train.getWagonEntities().get(i).getSumSeats();
@@ -216,6 +216,14 @@ public class TrainService {
         return freeSeats;
     }
 
+
+    /**
+     * @param trainNumber
+     * @param startStation
+     * @param endStation
+     * @param wagonNumber
+     * @return
+     */
     public List<SeatDto> getEmptySeats(Long trainNumber, String startStation, String endStation, Long wagonNumber) {
         TrainEntity train = trainEntityRepository.findByTrainNumber(trainNumber)
                 .orElseThrow(() -> new TrainNotFoundException("Train with trainNumber " + trainNumber + "not found"));
@@ -286,7 +294,7 @@ public class TrainService {
     public TrainDto rollBackTrain(TrainDto trainDto) {
         for (PointOfScheduleDto point : trainDto.getPointsOfSchedule()) {
             PointOfScheduleEntity p = pointOfScheduleRepository.findById(point.getId())
-                    .orElseThrow(() -> new ScheduleNotFoundException("Point with id " + point.getId() + "not found"));
+                    .orElseThrow(() -> new ScheduleNotFoundException("Point with id " + point.getId() + " not found"));
             p.setDelayed(point.getDelayed());
             p.setDepartureTime(point.getDepartureTime());
             p.setArrivalTime(point.getArrivalTime());
@@ -296,11 +304,9 @@ public class TrainService {
     }
 
     @Transactional
-    public TrainDto updateTrain(TrainDto trainDto) {
+    public TrainEntity updateTrain(TrainDto trainDto) {
         TrainEntity train = trainEntityRepository.findByTrainNumber(trainDto.getTrainNumber())
                 .orElseThrow(() -> new TrainNotFoundException("Train with trainNumber " + trainDto.getTrainNumber() + " not found"));
-
-
         for (int i = 0; i < train.getPointOfSchedules().size(); i++) {
             if (train.getPointOfSchedules().get(i).getDelayed() != trainDto.getPointsOfSchedule().get(i).getDelayed()) {
                 train.getPointOfSchedules().get(i).setDelayed(trainDto.getPointsOfSchedule().get(i).getDelayed());
@@ -311,9 +317,7 @@ public class TrainService {
                             .plusSeconds(trainDto.getPointsOfSchedule().get(i).getDepartureTime().toEpochSecond(ZoneOffset.of("+0"))
                                     - train.getPointOfSchedules().get(i).getDepartureTime().toEpochSecond(ZoneOffset.of("+0"))));
                 }
-
                 train.getPointOfSchedules().get(i).setDepartureTime(trainDto.getPointsOfSchedule().get(i).getDepartureTime());
-
             }
             Long delta = trainDto.getPointsOfSchedule().get(i).getArrivalTime().toEpochSecond(ZoneOffset.of("+0"))
                     - train.getPointOfSchedules().get(i).getArrivalTimeInit().toEpochSecond(ZoneOffset.of("+0"));
@@ -329,7 +333,6 @@ public class TrainService {
 
                     } else {
                         delta = 0L;
-                        //   train.getPointOfSchedules().get(j).setDelayed(EStatus.schedule);
                     }
                 }
             }
@@ -347,7 +350,7 @@ public class TrainService {
         }
         train = trainEntityRepository.save(train);
 
-        return TrainFacade.trainToDto(train);
+        return train;
     }
 }
 

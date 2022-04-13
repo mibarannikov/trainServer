@@ -4,6 +4,7 @@ import com.tasksbb.train.dto.PriceDto;
 import com.tasksbb.train.dto.SeatDto;
 import com.tasksbb.train.dto.TicketDto;
 import com.tasksbb.train.entity.User;
+import com.tasksbb.train.facade.TicketFacade;
 import com.tasksbb.train.service.TicketService;
 import com.tasksbb.train.service.TrainService;
 import com.tasksbb.train.service.UserService;

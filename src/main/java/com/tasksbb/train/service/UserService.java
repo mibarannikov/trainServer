@@ -24,12 +24,6 @@ public class UserService {
     private final BCryptPasswordEncoder passwordEncoder;
 
 
-//    public UserService(UserRepository userRepository, BCryptPasswordEncoder passwordEncoder) {
-//        this.userRepository = userRepository;
-//        this.passwordEncoder = passwordEncoder;
-//    }
-
-
     public User createUser(SignupRequest userIn) {
         User user = new User();
         user.setEmail(userIn.getEmail());
@@ -48,14 +42,6 @@ public class UserService {
         }
     }
 
-//    public User updateUser(UserDTO userDTO, Principal principal) {
-//        User user = getUserByPrincipal(principal);
-//        user.setName(userDTO.getFirstname());
-//        user.setLastname(userDTO.getLastname());
-//        user.setBio(userDTO.getBio());
-//
-//        return userRepository.save(user);
-//    }
 
     public User getCurrentUser(Principal principal) {
         return getUserByPrincipal(principal);

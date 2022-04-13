@@ -1,22 +1,22 @@
 {
   "id" : null,
-  "trainNumber" : 1,
+  "trainNumber" : 2,
   "departureTime" : "2022-04-08T13:03:00.000",
   "arrivalTimeEnd" : "2022-04-08T15:53:30.000",
   "trainSpeed" : 80.0,
   "sumSeats" : 36,
   "amountOfEmptySeats" : null,
   "pointsOfSchedule" : [ {
-    "id" : 34,
-    "nameStation" : "Брянск",
+    "id" : 100,
+    "nameStation" : "Кострома",
     "arrivalTime" : "2022-04-08T13:03:00.000",
     "arrivalTimeInit" : null,
     "departureTime" : "2022-04-08T13:09:00.000",
     "departureTimeInit" : null,
     "delayed" : null
   }, {
-    "id" : 35,
-    "nameStation" : "Рига",
+    "id" : 101,
+    "nameStation" : "Рыбинск",
     "arrivalTime" : "2022-04-08T15:53:30.000",
     "arrivalTimeInit" : null,
     "departureTime" : "2022-04-08T15:58:30.000",

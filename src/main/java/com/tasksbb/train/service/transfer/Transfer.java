@@ -1,4 +1,4 @@
-package com.tasksbb.train.service;
+package com.tasksbb.train.service.transfer;
 
 import com.tasksbb.train.entity.StationEntity;
 import com.tasksbb.train.entity.TrainEntity;

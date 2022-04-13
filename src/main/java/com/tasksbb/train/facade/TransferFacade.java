@@ -1,7 +1,7 @@
 package com.tasksbb.train.facade;
 
 import com.tasksbb.train.dto.TransferDto;
-import com.tasksbb.train.service.Transfer;
+import com.tasksbb.train.service.transfer.Transfer;
 
 public class TransferFacade {
     public static TransferDto transferToTransferDto(Transfer transfer) {

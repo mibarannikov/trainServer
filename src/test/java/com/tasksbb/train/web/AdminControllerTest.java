@@ -45,9 +45,9 @@ class AdminControllerTest {
 
     private ObjectMapper mapper = new ObjectMapper();
 
-    private TrainDto createTrainDto() throws Exception {
+    private TrainDto createTrainDto(String file) throws Exception {
         mapper.registerModule(new JSR310Module());
-        URL resource = getClass().getClassLoader().getResource("train_dto.json");
+        URL resource = getClass().getClassLoader().getResource(file);
         Path path = Paths.get(resource.toURI());
         TrainDto trainDto = mapper.readValue(path.toFile(), TrainDto.class);
         return trainDto;
@@ -69,17 +69,6 @@ class AdminControllerTest {
     }
 
 
-
-    @BeforeEach
-    private void init() throws Exception {
-
-    }
-
-    @Test
-    void addStation() throws Exception {
-
-    }
-
     @Test
     void editStation() throws Exception {
         mockMvc.perform(post("/api/admin//station/add").contentType(MediaType.APPLICATION_JSON).content(createJson("station_dto.json")))
@@ -88,7 +77,7 @@ class AdminControllerTest {
 
     @Test
     void addTrain() throws Exception {
-        stationService.addStation(createStationDto("station_dto.json"));
+        stationService.addStation(createStationDto("station_dto2.json"));
         stationService.addStation(createStationDto("station_dto1.json"));
         mockMvc.perform(post("/api/admin/train/add").contentType(MediaType.APPLICATION_JSON).content(createJson("train_dto.json")))
                 .andExpect(status().isOk());
@@ -136,9 +125,9 @@ class AdminControllerTest {
 
     @Test
     void train() throws Exception {
-        stationService.addStation(createStationDto("station_dto.json"));
-        stationService.addStation(createStationDto("station_dto1.json"));
-        trainService.addTrain(createTrainDto());
+        stationService.addStation(createStationDto("station_dto4.json"));
+        stationService.addStation(createStationDto("station_dto3.json"));
+        trainService.addTrain(createTrainDto("train_dto2.json"));
         mockMvc.perform(get("/api/admin/train/find").param("trainNumber", "1"))
                 .andExpect(status().isOk());
     }

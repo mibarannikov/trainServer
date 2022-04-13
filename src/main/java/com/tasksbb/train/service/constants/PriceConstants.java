@@ -1,4 +1,4 @@
-package com.tasksbb.train.service;
+package com.tasksbb.train.service.constants;
 
 public class PriceConstants {
     public static final Double PRICE_PER_METER = 0.0006;

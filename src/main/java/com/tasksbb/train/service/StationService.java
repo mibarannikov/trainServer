@@ -22,7 +22,6 @@ import java.time.ZoneOffset;
 import java.util.*;
 import java.util.stream.Collectors;
 
-//@RequiredArgsConstructor
 @Service
 @RequiredArgsConstructor
 public class StationService {
@@ -40,7 +39,6 @@ public class StationService {
 
 
     public List<StationEntity> findAllStation() {
-
         return stationEntityRepository.findByOrderByNameStationAsc();
     }
 
@@ -111,7 +109,6 @@ public class StationService {
             for (StationEntity s : result) {
                 addStationToCanGet(s, station);
                 setStatusPointOfSchedule(s, station, EStatus.schedule);
-
             }
         }
         station.setCanGetStations(newCanGet);
@@ -130,9 +127,9 @@ public class StationService {
     }
 
     private void deleteStationFromCanGet(StationEntity station, StationEntity deleteStation) {
-        Set<StationEntity> can = station.getCanGetStations();
-        can.remove(deleteStation);
-        station.setCanGetStations(can);
+        Set<StationEntity> reachable = station.getCanGetStations();
+        reachable.remove(deleteStation);
+        station.setCanGetStations(reachable);
         stationEntityRepository.save(station);
     }
 

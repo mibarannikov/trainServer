@@ -55,15 +55,20 @@
 		<dependency>
 			<groupId>org.apache.activemq.tooling</groupId>
 			<artifactId>activemq-junit</artifactId>
-			<version>5.16.3</version>
+			<version>5.17.0</version>
 			<scope>test</scope>
 		</dependency>
 
+<!--		<dependency>-->
+<!--			<groupId>org.apache.activemq</groupId>-->
+<!--			<artifactId>activemq-broker</artifactId>-->
+<!--			<version>5.17.0</version>-->
+<!--			<scope>test</scope>-->
+<!--		</dependency>-->
 		<dependency>
-			<groupId>org.apache.activemq</groupId>
-			<artifactId>activemq-broker</artifactId>
-			<version>5.16.3</version>
-			<scope>test</scope>
+			<groupId>org.messaginghub</groupId>
+			<artifactId>pooled-jms</artifactId>
+			<version>1.0.3</version>
 		</dependency>
 
 		<dependency>
@@ -85,6 +90,11 @@
 			<groupId>org.projectlombok</groupId>
 			<artifactId>lombok</artifactId>
 			<optional>true</optional>
+		</dependency>
+		<dependency>
+			<groupId>org.jeasy</groupId>
+			<artifactId>easy-random-core</artifactId>
+			<version>4.0.0</version>
 		</dependency>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
@@ -112,52 +122,52 @@
 				<configuration>
 					<excludes>
 						<exclude>
-							<groupId>org.projectlombok</groupId>
+							<groupId>org.project-lombok</groupId>
 							<artifactId>lombok</artifactId>
 						</exclude>
 					</excludes>
 				</configuration>
 			</plugin>
 
-			<plugin>
-				<groupId>org.openapitools</groupId>
-				<artifactId>openapi-generator-maven-plugin</artifactId>
-				<version>5.3.0</version>
-				<executions>
-					<execution>
-						<id>generate-sources-server</id>
-						<phase>generate-sources</phase>
-						<goals>
-							<goal>generate</goal>
-						</goals>
-						<configuration>
-							<inputSpec>${project.basedir}/src/resources/openApi/train.yaml</inputSpec>
-							<generatorName>spring</generatorName>
-							<generateApiTests>false</generateApiTests>
-							<generateApiDocumentation>false</generateApiDocumentation>
-							<generateModelTests>false</generateModelTests>
-							<generateModelDocumentation>false</generateModelDocumentation>
-							<apiPackage>${project.groupId}.train.api</apiPackage>
-							<modelPackage>${project.groupId}.train.model</modelPackage>
+<!--			<plugin>-->
+<!--				<groupId>org.openapitools</groupId>-->
+<!--				<artifactId>openapi-generator-maven-plugin</artifactId>-->
+<!--				<version>5.3.0</version>-->
+<!--				<executions>-->
+<!--					<execution>-->
+<!--						<id>generate-sources-server</id>-->
+<!--						<phase>generate-sources</phase>-->
+<!--						<goals>-->
+<!--							<goal>generate</goal>-->
+<!--						</goals>-->
+<!--						<configuration>-->
+<!--							<inputSpec>${project.basedir}/src/resources/openApi/train.yaml</inputSpec>-->
+<!--							<generatorName>spring</generatorName>-->
+<!--							<generateApiTests>false</generateApiTests>-->
+<!--							<generateApiDocumentation>false</generateApiDocumentation>-->
+<!--							<generateModelTests>false</generateModelTests>-->
+<!--							<generateModelDocumentation>false</generateModelDocumentation>-->
+<!--							<apiPackage>${project.groupId}.train.api</apiPackage>-->
+<!--							<modelPackage>${project.groupId}.train.model</modelPackage>-->
 
-							<library>spring-boot</library>
+<!--							<library>spring-boot</library>-->
 
-							<configOptions>
-								<library>webclient</library>
-								<library>spring-boot</library>
-								<delegatePattern>true</delegatePattern>
-								<dateLibrary>java8-offsetdatetime</dateLibrary>
-								<performBeanValidation>true</performBeanValidation>
-								<useBeanValidation>true</useBeanValidation>
-							</configOptions>
+<!--							<configOptions>-->
+<!--								<library>webclient</library>-->
+<!--								<library>spring-boot</library>-->
+<!--								<delegatePattern>true</delegatePattern>-->
+<!--								<dateLibrary>java8-offsetdatetime</dateLibrary>-->
+<!--								<performBeanValidation>true</performBeanValidation>-->
+<!--								<useBeanValidation>true</useBeanValidation>-->
+<!--							</configOptions>-->
 
-							<environmentVariables>
-								<supportingFiles>ApiUtil.java</supportingFiles>
-							</environmentVariables>
-						</configuration>
-					</execution>
-				</executions>
-			</plugin>
+<!--							<environmentVariables>-->
+<!--								<supportingFiles>ApiUtil.java</supportingFiles>-->
+<!--							</environmentVariables>-->
+<!--						</configuration>-->
+<!--					</execution>-->
+<!--				</executions>-->
+<!--			</plugin>-->
 
 
 		</plugins>

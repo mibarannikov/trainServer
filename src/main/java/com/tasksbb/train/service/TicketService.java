@@ -3,11 +3,10 @@ package com.tasksbb.train.service;
 import com.tasksbb.train.dto.PointOfScheduleDto;
 import com.tasksbb.train.dto.TicketDto;
 import com.tasksbb.train.entity.*;
-import com.tasksbb.train.ex.ScheduleNotFoundException;
-import com.tasksbb.train.ex.SeatNotFoundException;
-import com.tasksbb.train.ex.TrainNotFoundException;
+import com.tasksbb.train.ex.*;
 import com.tasksbb.train.facade.TicketFacade;
 import com.tasksbb.train.repository.*;
+import com.tasksbb.train.service.constants.PriceConstants;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -28,8 +27,6 @@ public class TicketService {
 
     private final PassengerEntityRepository passengerEntityRepository;
 
-    private final PassengerService passengerService;
-
     private final TrainEntityRepository trainEntityRepository;
 
     private final StationService stationService;
@@ -37,8 +34,7 @@ public class TicketService {
     @Transactional
     public TicketDto buyTicket(TicketDto ticketDto, User user) {
         if (!timeValidationTicket(ticketDto)) {
-            ticketDto.getNameStations().get(0).setNameStation("station whose name is oblivion");//todo throw exception
-            return ticketDto;
+            throw  new StationIsOblivionException("Посадка окончена");
         }
         TicketEntity newTicket = new TicketEntity();
         TrainEntity train = trainEntityRepository.findByTrainNumber(ticketDto.getNumberTrainOwner())
@@ -79,9 +75,8 @@ public class TicketService {
             pass.setDateOfBirth(ticketDto.getDateOfBirth());
             newTicket.setPassengerEntity(pass);
         } else {
-            if (passengerService.passengerIsPresent(seat.getTrainEntity(), passenger.get(), newTicket.getPointOfSchedules())) {
-                ticketDto.setId(0L);//todo throw exception
-                return ticketDto;
+            if (passengerIsPresent(seat.getTrainEntity(), passenger.get(), newTicket.getPointOfSchedules())) {
+                throw new PassengerInTrainException("Пассажир уже зарегистрироан");
             }
             newTicket.setPassengerEntity(passenger.get());
         }
@@ -90,7 +85,26 @@ public class TicketService {
         newTicket = ticketEntityRepository.save(newTicket);
         return TicketFacade.ticketToTicketDto(newTicket);
     }
+    private Boolean passengerIsPresent(TrainEntity train, PassengerEntity passenger, List<PointOfScheduleEntity> points) {
+        List<TicketEntity> tickets = ticketEntityRepository.findBySeatEntity_TrainEntity_TrainNumber(train.getTrainNumber());
+        for (TicketEntity tk : tickets) {
+            if (tk.getPassengerEntity().equals(passenger)
+                    && points.get(0).getDepartureTime().isBefore(tk.getPointOfSchedules().get(tk.getPointOfSchedules().size() - 1).getArrivalTime())
+                    && points.get(points.size() - 1).getArrivalTime().isAfter(tk.getPointOfSchedules().get(0).getDepartureTime())) {
+                return true;
+            }
+        }
+        return false;
+    }
 
+
+
+
+    /**
+     * @param user
+     * @param param
+     * @return
+     */
     public List<TicketDto> getAllUserTickets(User user, String param) {
         List<TicketEntity> tickets = ticketEntityRepository.findAllByUser(user);
         if (Objects.equals(param, "act")) {
@@ -127,6 +141,13 @@ public class TicketService {
                 .collect(Collectors.toList());
     }
 
+    /**
+     * @param trainNumber
+     * @param wagonNumber
+     * @param startStation
+     * @param endStation
+     * @return
+     */
     public String priceCalculation(Long trainNumber, Long wagonNumber, String startStation, String endStation) {
         TrainEntity train = trainEntityRepository.findByTrainNumber(trainNumber)
                 .orElseThrow(() -> new TrainNotFoundException("Train with trainNumber " + trainNumber + "not found"));
