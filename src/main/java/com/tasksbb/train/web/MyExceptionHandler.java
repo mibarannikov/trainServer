@@ -15,10 +15,10 @@ import java.util.Map;
 @ControllerAdvice
 public class MyExceptionHandler {
 
-    @ExceptionHandler(ValidationException.class)
-    public ResponseEntity<Map<String, String>> validationException(ValidationException ex) {
-        return new ResponseEntity<>(ex.getErrors(), HttpStatus.BAD_REQUEST);
-    }
+//    @ExceptionHandler(ValidationException.class)
+//    public ResponseEntity<Map<String, String>> validationException(ValidationException ex) {
+//        return new ResponseEntity<>(ex.getErrors(), HttpStatus.BAD_REQUEST);
+//    }
 
     @ExceptionHandler(TrainExistException.class)
     public ResponseEntity<ResponseError> trainExistException(TrainExistException ex) {

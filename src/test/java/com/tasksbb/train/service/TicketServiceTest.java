@@ -67,53 +67,53 @@ class TicketServiceTest {
 
     }
 
-//    @Test
-//    void buyTicket() throws URISyntaxException, IOException {
-//        TicketDto ticketDto = createTicketDto();
-//        TrainEntity trainEntity = new TrainEntity();
-//        SeatEntity seat = new SeatEntity();
-//        trainEntity.setTrainNumber(111L);
-//        seat.setTrainEntity(trainEntity);
-//
-//        ticketDto.getNameStations().get(0).setDepartureTime(LocalDateTime.now().plusMinutes(12));
-//        when(trainEntityRepository.findByTrainNumber(ArgumentMatchers.anyLong())).thenReturn(Optional.of(trainEntity));
-//        when(seatEntityRepository.findByTrainEntityTrainNumberAndSeatNumber(
-//                ArgumentMatchers.anyLong(),
-//                ArgumentMatchers.anyLong()))
-//                .thenReturn(Optional.of(new SeatEntity()));
-//        when(pointOfScheduleRepository.findByTrainEntityAndStationEntityNameStation(
-//                ArgumentMatchers.any(TrainEntity.class),
-//                ArgumentMatchers.anyString()))
-//                .thenReturn(Optional.of(new PointOfScheduleEntity()));
-//        when(seatEntityRepository
-//                .findByTrainEntityTrainNumberAndSeatNumber(anyLong(),anyLong()))
-//                .thenReturn(Optional.of(seat));
-//        when(pointOfScheduleRepository.findByTrainEntityAndStationEntityNameStation(any(TrainEntity.class),anyString()))
-//                .thenReturn(Optional.of(new PointOfScheduleEntity()));
-//        when(passengerEntityRepository.findByFirstnameAndLastnameAndDateOfBirth(
-//                ArgumentMatchers.anyString(),
-//                ArgumentMatchers.anyString(),
-//                ArgumentMatchers.any(LocalDate.class))).thenReturn(Optional.empty());
-////        when(passengerService.passengerIsPresent(ArgumentMatchers.any(TrainEntity.class),
-////                ArgumentMatchers.any(PassengerEntity.class),
-////                ArgumentMatchers.anyList())).thenReturn(false);
-//        when(ticketEntityRepository.save(ArgumentMatchers.any(TicketEntity.class))).thenReturn(new TicketEntity());
-//      //  when(TicketFacade.ticketToTicketDto(any(TicketEntity.class))).thenReturn(ticketDto);
-//        ticketService.buyTicket(ticketDto, new User());
-//        verify(trainEntityRepository, times(1)).findByTrainNumber(ArgumentMatchers.anyLong());
-//        verify(seatEntityRepository, times(1)).findByTrainEntityTrainNumberAndSeatNumber(
-//                ArgumentMatchers.anyLong(),
-//                ArgumentMatchers.anyLong());
-//        verify(pointOfScheduleRepository, times(3))
-//                .findByTrainEntityAndStationEntityNameStation(
-//                        ArgumentMatchers.any(TrainEntity.class),
-//                        ArgumentMatchers.anyString());
-//        verify(passengerEntityRepository, times(1))
-//                .findByFirstnameAndLastnameAndDateOfBirth(
-//                        ArgumentMatchers.anyString(),
-//                        ArgumentMatchers.anyString(),
-//                        ArgumentMatchers.any(LocalDate.class));
-//    }
+    @Test
+    void buyTicket() throws URISyntaxException, IOException {
+        TicketDto ticketDto = createTicketDto();
+        TrainEntity trainEntity = new TrainEntity();
+        SeatEntity seat = new SeatEntity();
+        trainEntity.setTrainNumber(111L);
+        seat.setTrainEntity(trainEntity);
+
+        ticketDto.getNameStations().get(0).setDepartureTime(LocalDateTime.now().plusMinutes(12));
+        when(trainEntityRepository.findByTrainNumber(ArgumentMatchers.anyLong())).thenReturn(Optional.of(trainEntity));
+        when(seatEntityRepository.findByTrainEntityTrainNumberAndSeatNumber(
+                ArgumentMatchers.anyLong(),
+                ArgumentMatchers.anyLong()))
+                .thenReturn(Optional.of(new SeatEntity()));
+        when(pointOfScheduleRepository.findByTrainEntityAndStationEntityNameStation(
+                ArgumentMatchers.any(TrainEntity.class),
+                ArgumentMatchers.anyString()))
+                .thenReturn(Optional.of(new PointOfScheduleEntity()));
+        when(seatEntityRepository
+                .findByTrainEntityTrainNumberAndSeatNumber(anyLong(),anyLong()))
+                .thenReturn(Optional.of(seat));
+        when(pointOfScheduleRepository.findByTrainEntityAndStationEntityNameStation(any(TrainEntity.class),anyString()))
+                .thenReturn(Optional.of(new PointOfScheduleEntity()));
+        when(passengerEntityRepository.findByFirstnameAndLastnameAndDateOfBirth(
+                ArgumentMatchers.anyString(),
+                ArgumentMatchers.anyString(),
+                ArgumentMatchers.any(LocalDate.class))).thenReturn(Optional.empty());
+//        when(passengerService.passengerIsPresent(ArgumentMatchers.any(TrainEntity.class),
+//                ArgumentMatchers.any(PassengerEntity.class),
+//                ArgumentMatchers.anyList())).thenReturn(false);
+        when(ticketEntityRepository.save(ArgumentMatchers.any(TicketEntity.class))).thenReturn(new TicketEntity());
+      //  when(TicketFacade.ticketToTicketDto(any(TicketEntity.class))).thenReturn(ticketDto);
+        ticketService.buyTicket(ticketDto, new User());
+        verify(trainEntityRepository, times(1)).findByTrainNumber(ArgumentMatchers.anyLong());
+        verify(seatEntityRepository, times(1)).findByTrainEntityTrainNumberAndSeatNumber(
+                ArgumentMatchers.anyLong(),
+                ArgumentMatchers.anyLong());
+        verify(pointOfScheduleRepository, times(3))
+                .findByTrainEntityAndStationEntityNameStation(
+                        ArgumentMatchers.any(TrainEntity.class),
+                        ArgumentMatchers.anyString());
+        verify(passengerEntityRepository, times(1))
+                .findByFirstnameAndLastnameAndDateOfBirth(
+                        ArgumentMatchers.anyString(),
+                        ArgumentMatchers.anyString(),
+                        ArgumentMatchers.any(LocalDate.class));
+    }
 
     @Test
     void getAllUserTickets() {

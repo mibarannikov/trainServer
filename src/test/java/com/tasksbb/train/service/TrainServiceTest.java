@@ -246,6 +246,7 @@ class TrainServiceTest {
         train.getPointOfSchedules().add(p2);
         when(trainEntityRepository.findByTrainNumber(anyLong()))
                 .thenReturn(Optional.of(train));
+        when(trainEntityRepository.save(any(TrainEntity.class))).thenReturn(train);
         trainService.updateTrain(createTrainDto());
         verify(trainEntityRepository,times(1)).findByTrainNumber(anyLong());
         verify(trainEntityRepository,times(1)).save(any(TrainEntity.class));

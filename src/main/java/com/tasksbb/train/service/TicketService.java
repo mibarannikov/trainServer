@@ -8,6 +8,7 @@ import com.tasksbb.train.facade.TicketFacade;
 import com.tasksbb.train.repository.*;
 import com.tasksbb.train.service.constants.PriceConstants;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -17,6 +18,7 @@ import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 @Service
+@Slf4j
 public class TicketService {
 
     private final SeatEntityRepository seatEntityRepository;
@@ -31,8 +33,14 @@ public class TicketService {
 
     private final StationService stationService;
 
+    /**
+     *
+     * @param ticketDto
+     * @param user
+     * @return
+     */
     @Transactional
-    public TicketDto buyTicket(TicketDto ticketDto, User user) {
+    public TicketEntity buyTicket(TicketDto ticketDto, User user) {
         if (!timeValidationTicket(ticketDto)) {
             throw  new StationIsOblivionException("Посадка окончена");
         }
@@ -83,8 +91,12 @@ public class TicketService {
         newTicket.setUser(user);
         newTicket.setSeatEntity(seat);
         newTicket = ticketEntityRepository.save(newTicket);
-        return TicketFacade.ticketToTicketDto(newTicket);
+        log.info("Bought a ticket whit id {} , time {} ",newTicket.getId(), LocalDateTime.now());
+        return newTicket;
     }
+
+
+
     private Boolean passengerIsPresent(TrainEntity train, PassengerEntity passenger, List<PointOfScheduleEntity> points) {
         List<TicketEntity> tickets = ticketEntityRepository.findBySeatEntity_TrainEntity_TrainNumber(train.getTrainNumber());
         for (TicketEntity tk : tickets) {

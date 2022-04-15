@@ -15,28 +15,23 @@ import com.tasksbb.train.service.TicketService;
 import com.tasksbb.train.service.TrainService;
 import com.tasksbb.train.validations.ResponseErrorValidation;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.jms.core.JmsTemplate;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("api/admin")
 @CrossOrigin
+@Slf4j
 public class AdminController {
 
     private static final Logger LOG = LoggerFactory.getLogger(AdminController.class);
@@ -61,6 +56,7 @@ public class AdminController {
 //        }
         StationEntity station = stationService.addStation(stationDto);
         jmsTemplate.convertAndSend("one", "update");
+        log.debug("message sent update in ActiveMQ destination one from AdminController.addStation(), time {} ", LocalDateTime.now());
         return new ResponseEntity<>(StationFacade.stationToStationDto(station), HttpStatus.OK);
     }
 
@@ -73,6 +69,7 @@ public class AdminController {
 //        }
         StationDto station = stationService.editStation(stationDto);
        jmsTemplate.convertAndSend("one", "update");
+        log.debug("message sent update in ActiveMQ destination one from AdminController.editStation(), time {} ", LocalDateTime.now());
         return new ResponseEntity<>(station, HttpStatus.OK);
     }
 
@@ -83,6 +80,7 @@ public class AdminController {
         String trainJson = gson.toJson(train);
         LOG.info(trainJson);
         jmsTemplate.convertAndSend("one", "update");
+        log.debug("message sent update in ActiveMQ destination one from AdminController.rollBackTrain(), time {} ", LocalDateTime.now());
         return new ResponseEntity<>(train, HttpStatus.OK);
     }
 
@@ -90,6 +88,7 @@ public class AdminController {
     public ResponseEntity<TrainDto> updateTrain(@RequestBody TrainDto trainDto, BindingResult bindingResult) {
         TrainDto train = TrainFacade.trainToDto(trainService.updateTrain(trainDto));
         jmsTemplate.convertAndSend("one", "update");
+        log.debug("message sent update in ActiveMQ destination one from AdminController.updateTrain(), time {} ", LocalDateTime.now());
         return new ResponseEntity<>(train, HttpStatus.OK);
     }
 
@@ -103,6 +102,7 @@ public class AdminController {
 //        }
         TrainEntity train = trainService.addTrain(trainDto);
         jmsTemplate.convertAndSend("one", "update");
+        log.debug("message sent update in ActiveMQ destination one from AdminController.addTrain(), time {} ", LocalDateTime.now());
         return new ResponseEntity<>(TrainFacade.trainToDto(train), HttpStatus.OK);
     }
 
